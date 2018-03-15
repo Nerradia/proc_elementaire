@@ -33,21 +33,23 @@ begin
         if reset = '1' then
             cpt <= 0;
 
-        elsif rising_edge(clk) and clk_en = '1' then
+        elsif rising_edge(clk) then
+            if clk_en = '1' then
 
-            if init_cpt = '1' then 
-                cpt <= 0;
-
-            elsif load_cpt = '1' then
-                cpt <= to_integer(unsigned(cpt_in));
-            
-            elsif en_cpt = '1' then
-                if cpt < 2**address_size-1 then
-                    cpt <= cpt + 1;
-                
-                else
+                if init_cpt = '1' then 
                     cpt <= 0;
 
+                elsif load_cpt = '1' then
+                    cpt <= to_integer(unsigned(cpt_in));
+                
+                elsif en_cpt = '1' then
+                    if cpt < 2**address_size-1 then
+                        cpt <= cpt + 1;
+                    
+                    else
+                        cpt <= 0;
+
+                    end if;
                 end if;
             end if;
         end if;

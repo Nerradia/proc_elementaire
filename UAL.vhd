@@ -5,8 +5,8 @@ use IEEE.numeric_std.all;
 
 entity UAL is
     generic (
-            data_size     : integer := 8;
-            sel_ual_size : integer := 1
+        data_size       : integer := 8;
+        sel_ual_size    : integer := 1
         );
     port (
         sel_ual   : in  std_logic_vector (sel_ual_size-1 downto 0);
@@ -31,11 +31,11 @@ begin
             when 0 => -- NOR
                 data_out_with_carry <= "0" & (data_A nor data_B);
 
-            when 1 =>
-                data_out_with_carry <= std_logic_vector(signed("0" & data_A) + signed("0" & data_B));
+            when 1 => -- ADDITION
+                data_out_with_carry <= std_logic_vector(unsigned("0" & data_A) + unsigned("0" & data_B));
 
             when others =>
-                report "Unexpected sel_ual value" severity error;
+                data_out_with_carry <= (others => '0');
 
         end case;
     end process;

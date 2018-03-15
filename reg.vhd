@@ -30,17 +30,17 @@ begin
         if reset = '1' then
             data_out <= (others => '0');
 
-        elsif rising_edge(clk) and clk_en = '1' then
+        elsif rising_edge(clk) then
+            if clk_en = '1' then
 
+                if init = '1' then
+                    data_out <= (others => '0');
 
-            if init = '1' then
-                data_out <= (others => '0');
+                elsif load = '1' then
+                    data_out <= data_in;
 
-            elsif load = '1' then
-                data_out <= data_in;
-
-            end if;
-
+                end if;
+            end if; 
         end if;
     end process;
 

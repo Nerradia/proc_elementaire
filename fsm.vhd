@@ -42,16 +42,59 @@ entity FSM is
 end entity FSM;
 
 architecture rtl of FSM is
-    type STATES is (INIT, FETCH_INST, FETCH_INST_WAIT, DECODE, FETCH_OP, EXE_UAL, STA, EXE_JCC); 
+    type STATES is (INIT, FETCH_INST, DECODE, FETCH_OP, EXE_UAL, STA, EXE_JCC); 
     signal state : STATES;
+    signal next_state : STATES;
 begin
 
-
-    process(clk, reset) is
+    process(state, op_code) is
     begin
-        if reset = '1' then
-            state <= INIT;
 
+        case state is
+        when INIT =>
+            next_state <= FETCH_INST;
+
+        when FETCH_INST =>
+            next_state <= DECODE; --FETCH_INST_WAIT;
+
+        when DECODE =>
+            if op_code(1) = '0' then
+                next_state <= FETCH_OP;
+
+            elsif op_code = "10" then
+                next_state <= STA;
+
+            elsif op_code = "11" then
+                next_state <= EXE_JCC;
+
+            end if;
+
+
+        when FETCH_OP =>
+            next_state <= EXE_UAL;
+
+        when EXE_UAL =>
+            next_state <= FETCH_INST;      
+
+        when STA =>
+            next_state <= FETCH_INST;
+
+        when EXE_JCC =>
+            next_state <= FETCH_INST;
+
+        when others =>
+            next_state <= INIT;
+
+        end case;
+    end process;
+
+
+
+    process (state, carry, op_code)
+    begin
+        case state is 
+
+        when INIT =>
             init_cpt <= '0';
             en_cpt   <= '0';
             load_cpt <= '0';
@@ -65,163 +108,111 @@ begin
             en_mem   <= '0';
             sel_ual  <= (others => '0');
 
-        elsif rising_edge(clk) and clk_en = '1' then
+        when FETCH_INST =>
+            en_cpt   <= '1';
+            load_ri  <= '1';
+            en_mem   <= '1';
+            R_W      <= '0';
 
-            case state is 
+            init_cpt <= '0';
+            load_cpt <= '0';
+            sel_mux  <= '0';
+            init_ff  <= '0';
+            load_ff  <= '0';
+            load_rd  <= '0';
+            load_ra  <= '0';
+            sel_ual  <= (others => '0');     
 
-            when INIT =>
-                init_cpt <= '0';
-                en_cpt   <= '0';
-                load_cpt <= '0';
-                sel_mux  <= '0';
-                init_ff  <= '0';
-                load_ff  <= '0';
-                load_ri  <= '0';
-                load_rd  <= '0';
-                load_ra  <= '0';
-                R_W      <= '0';
-                en_mem   <= '0';
-                sel_ual  <= (others => '0');
+        when DECODE =>
+            sel_mux  <= '1';
 
-                state <= FETCH_INST;
+            init_cpt <= '0';
+            en_cpt   <= '0';
+            load_cpt <= '0';
+            init_ff  <= '0';
+            load_ff  <= '0';
+            load_ri  <= '0';
+            load_rd  <= '0';
+            load_ra  <= '0';
+            R_W      <= '0';
+            en_mem   <= '0';
+            sel_ual  <= (others => '0');
 
+        when FETCH_OP =>
+            sel_mux  <= '1';
+            en_mem   <= '1';
+            R_W      <= '0';
+            load_rd  <= '1';
 
-            when FETCH_INST =>
-                en_cpt   <= '1';
-                load_ri  <= '1';
-                en_mem   <= '1';
-                R_W      <= '0';
+            init_cpt <= '0';
+            en_cpt   <= '0';
+            load_cpt <= '0';
+            init_ff  <= '0';
+            load_ff  <= '0';
+            load_ri  <= '0';
+            load_ra  <= '0';
+            sel_ual  <= (others => '0');
 
-                init_cpt <= '0';
-                load_cpt <= '0';
-                sel_mux  <= '0';
-                init_ff  <= '0';
-                load_ff  <= '0';
-                load_rd  <= '0';
-                load_ra  <= '0';
-                sel_ual  <= (others => '0');
+        when EXE_UAL =>
+            sel_mux  <= '1';
+            sel_ual  <= op_code(0 downto 0);
+            load_ra  <= '1';
+            load_ff  <= op_code(0);
 
-                state <= FETCH_INST_WAIT;
+            init_cpt <= '0';
+            en_cpt   <= '0';
+            load_cpt <= '0';
+            init_ff  <= '0';
+            load_ri  <= '0';
+            load_rd  <= '0';
+            R_W      <= '0';
+            en_mem   <= '0';
 
-            when FETCH_INST_WAIT =>
-                sel_mux  <= '1';
+        when STA =>
+            sel_mux  <= '1';
+            en_mem   <= '1';
+            R_W      <= '1';
 
-                init_cpt <= '0';
-                en_cpt   <= '0';
-                load_cpt <= '0';
-                init_ff  <= '0';
-                load_ff  <= '0';
-                load_ri  <= '0';
-                load_rd  <= '0';
-                load_ra  <= '0';
-                R_W      <= '0';
-                en_mem   <= '0';
-                sel_ual  <= (others => '0');            
+            init_cpt <= '0';
+            en_cpt   <= '0';
+            load_cpt <= '0';
+            init_ff  <= '0';
+            load_ff  <= '0';
+            load_ri  <= '0';
+            load_rd  <= '0';
+            load_ra  <= '0';
+            sel_ual  <= (others => '0');
 
-                state <= DECODE;
+        when EXE_JCC =>
+            sel_mux  <= '1';
+            init_ff  <= carry;
+            load_cpt <= not carry;
+            load_ri  <= '1';
 
-
-            when DECODE =>
-                sel_mux  <= '1';
-
-                init_cpt <= '0';
-                en_cpt   <= '0';
-                load_cpt <= '0';
-                init_ff  <= '0';
-                load_ff  <= '0';
-                load_ri  <= '0';
-                load_rd  <= '0';
-                load_ra  <= '0';
-                R_W      <= '0';
-                en_mem   <= '0';
-                sel_ual  <= (others => '0');
-
-                if op_code(1) = '0' then
-                    state <= FETCH_OP;
-
-                elsif op_code = "10" then
-                    state <= STA;
-
-                elsif op_code = "11" then
-                    state <= EXE_JCC;
-
-                end if;
-
-
-            when FETCH_OP =>
-                sel_mux  <= '1';
-                en_mem   <= '1';
-                R_W      <= '0';
-                load_rd  <= '1';
-
-                init_cpt <= '0';
-                en_cpt   <= '0';
-                load_cpt <= '0';
-                init_ff  <= '0';
-                load_ff  <= '0';
-                load_ri  <= '0';
-                load_ra  <= '0';
-                sel_ual  <= (others => '0');
-
-                state <= EXE_UAL;
-
-            when EXE_UAL =>
-                sel_mux  <= '1';
-                sel_ual  <= op_code(0 downto 0);
-                load_ra  <= '1';
-                load_ff  <= op_code(0);
-
-                init_cpt <= '0';
-                en_cpt   <= '0';
-                load_cpt <= '0';
-                init_ff  <= '0';
-                load_ri  <= '0';
-                load_rd  <= '0';
-                R_W      <= '0';
-                en_mem   <= '0';
-
-                state <= FETCH_INST;      
-
-            when STA =>
-                sel_mux  <= '1';
-                en_mem   <= '1';
-                R_W      <= '1';
-
-                init_cpt <= '0';
-                en_cpt   <= '0';
-                load_cpt <= '0';
-                init_ff  <= '0';
-                load_ff  <= '0';
-                load_ri  <= '0';
-                load_rd  <= '0';
-                load_ra  <= '0';
-                sel_ual  <= (others => '0');
-
-                state <= FETCH_INST;
-
-            when EXE_JCC =>
-                sel_mux  <= '1';
-                init_ff  <= carry;
-                load_cpt <= not carry;
-                load_ri  <= '1';
-
-                init_cpt <= '0';
-                en_cpt   <= '0';
-                load_ff  <= '0';
-                load_rd  <= '0';
-                load_ra  <= '0';
-                R_W      <= '0';
-                en_mem   <= '0';
-                sel_ual  <= (others => '0');
-
-                state <= FETCH_INST;
+            init_cpt <= '0';
+            en_cpt   <= '0';
+            load_ff  <= '0';
+            load_rd  <= '0';
+            load_ra  <= '0';
+            R_W      <= '0';
+            en_mem   <= '0';
+            sel_ual  <= (others => '0');
+        end case;
+    end process;
 
 
-            when others =>
-                state <= INIT;
 
-            end case;
 
+    process(clk, reset) is
+    begin
+        if reset = '1' then
+            state <= INIT;
+
+        elsif rising_edge(clk) then
+            if clk_en = '1' then
+                state <= next_state;
+                
+            end if;
         end if;
     end process;
 

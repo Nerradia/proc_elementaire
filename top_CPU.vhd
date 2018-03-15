@@ -5,15 +5,19 @@ use IEEE.numeric_std.all;
 
 entity top_CPU is
     generic (
-            op_code_size : integer := 2;    -- Largeur du signal des instructions
-            sel_ual_size : integer := 1;    -- Taille du sélectionneur d'opération de l'UAL
-            data_size    : integer := 8;    -- Taille de chaque mot stocké
-            address_size : integer := 6     -- Largeur de l'adresse
+        op_code_size : integer := 2;    -- Largeur du signal des instructions
+        sel_ual_size : integer := 1;    -- Taille du sélectionneur d'opération de l'UAL
+        data_size    : integer := 8;    -- Taille de chaque mot stocké
+        address_size : integer := 6     -- Largeur de l'adresse
         );                                  -- Attention, op_code + address_size doivent valoir data_size !
     port (
-        reset    : in  std_logic;
-        clk      : in  std_logic;
-        clk_en   : in  std_logic
+        reset           : in  std_logic;
+        clk             : in  std_logic;
+        clk_en          : in  std_logic;
+
+        addr            : out std_logic_vector (address_size-1 downto 0);
+        data_mem_in     : out std_logic_vector (data_size-1 downto 0);
+        data_mem_out    : out std_logic_vector (data_size-1 downto 0)
         );
 
 end entity;
@@ -23,11 +27,10 @@ architecture rtl of top_CPU is
 
     component RAM is
     generic (
-            data_size    : integer := 8; -- Taille de chaque mot stocké
-            address_size : integer := 6  -- Largeur du signal d'adresses
+        data_size    : integer := 8; -- Taille de chaque mot stocké
+        address_size : integer := 6  -- Largeur du signal d'adresses
         );
     port (
-        reset    : in  std_logic;
         clk      : in  std_logic;
         clk_en   : in  std_logic;
 
@@ -41,9 +44,9 @@ architecture rtl of top_CPU is
 
     component UT is
     generic (
-            op_code_size : integer := 2; -- Largeur du signal des instructions
-            sel_ual_size : integer := 1; -- Taille du sélectionneur d'opération de l'UAL
-            data_size    : integer := 8  -- Taille de chaque mot stocké
+        op_code_size : integer := 2; -- Largeur du signal des instructions
+        sel_ual_size : integer := 1; -- Taille du sélectionneur d'opération de l'UAL
+        data_size    : integer := 8  -- Taille de chaque mot stocké
         );
     port (
         reset    : in  std_logic;
@@ -55,7 +58,7 @@ architecture rtl of top_CPU is
 
         carry    : out std_logic;
 
-        sel_ual  : in std_logic_vector(op_code_size-1 downto 0);
+        sel_ual  : in std_logic_vector(sel_ual_size-1 downto 0);
 
         load_ra  : in std_logic;
         load_ff  : in std_logic;
@@ -67,10 +70,10 @@ architecture rtl of top_CPU is
 
     component UC is
     generic (
-            op_code_size : integer := 2;  -- Largeur du signal des instructions
-            sel_ual_size : integer := 1; -- Taille du sélectionneur d'opération de l'UAL
-            data_size    : integer := 8;  -- Taille de chaque mot stocké
-            address_size : integer := 6
+        op_code_size : integer := 2;  -- Largeur du signal des instructions
+        sel_ual_size : integer := 1; -- Taille du sélectionneur d'opération de l'UAL
+        data_size    : integer := 8;  -- Taille de chaque mot stocké
+        address_size : integer := 6
         );
     port (
         reset    : in  std_logic;
@@ -79,7 +82,7 @@ architecture rtl of top_CPU is
 
 
         data_in     : in  std_logic_vector(data_size-1 downto 0);
-        address_out : out std_logic_vector(data_size-1 downto 0);
+        address_out : out std_logic_vector(address_size-1 downto 0);
 
 
         -- Registres de la partie UT
@@ -126,7 +129,6 @@ inst_RAM : RAM
         address_size => address_size
     )
     port map(
-        reset    => reset,
         clk      => clk,
         clk_en   => clk_en,
 
@@ -139,9 +141,9 @@ inst_RAM : RAM
 
 inst_ut : UT
     generic map(
-            op_code_size => op_code_size,
-            sel_ual_size => sel_ual_size,
-            data_size    => data_size
+        op_code_size => op_code_size,
+        sel_ual_size => sel_ual_size,
+        data_size    => data_size
         )
     port map(
         reset    => reset,
@@ -163,10 +165,10 @@ inst_ut : UT
 
 inst_uc :  UC
     generic map(
-            op_code_size => op_code_size,
-            sel_ual_size => sel_ual_size,
-            data_size    => data_size,
-            address_size => address_size
+        op_code_size => op_code_size,
+        sel_ual_size => sel_ual_size,
+        data_size    => data_size,
+        address_size => address_size
         )
     port map(
         reset    => reset,
@@ -193,6 +195,8 @@ inst_uc :  UC
         );
 
 
-
+addr         <= address;
+data_mem_in  <= data_RAM_out;
+data_mem_out <= data_RAM_in;
 
 end architecture;
