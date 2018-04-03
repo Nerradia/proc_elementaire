@@ -55,7 +55,7 @@ begin
             next_state <= FETCH_INST;
 
         when FETCH_INST =>
-            next_state <= DECODE; --FETCH_INST_WAIT;
+            next_state <= DECODE;
 
         when DECODE =>
             if op_code(1) = '0' then
@@ -68,7 +68,6 @@ begin
                 next_state <= EXE_JCC;
 
             end if;
-
 
         when FETCH_OP =>
             next_state <= EXE_UAL;

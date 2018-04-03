@@ -31,7 +31,7 @@ architecture rtl of RAM is
          x"C0", x"CD", x"00", x"00",
          x"00", x"FF", x"01", x"00",
          x"28", x"18",
-         others => (others => '0')); --  PGCD du prof ;
+         others => (others => '0')); --  PGCD du prof
 
     -- (x"08", x"47", x"86", x"C4", x"C4", x"00", x"00", x"7E", x"FE", others => (others => '0'));
 
