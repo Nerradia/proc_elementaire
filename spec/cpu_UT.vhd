@@ -24,7 +24,8 @@ entity UT is
         load_ra  : in std_logic;
         load_ff  : in std_logic;
         load_rd  : in std_logic;
-        init_ff  : in std_logic
+        init_ff  : in std_logic;
+        init_acc : in std_logic
         );
 
 end entity;
@@ -115,7 +116,7 @@ inst_reg_accu : reg
         clk_en  => clk_en,
 
         load    => load_ra,
-        init    => '0',
+        init    => init_acc,
 
         data_in  => UAL_out_to_accu,
         data_out => reg_accu_to_UAL
