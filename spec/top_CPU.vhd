@@ -14,9 +14,13 @@ entity top_CPU is
         reset           : in  std_logic;
         clk             : in  std_logic;
         clk_en          : in  std_logic;
-        cpu_out_en      : in  std_logic;
 
-        addr            : out std_logic_vector (address_size-1 downto 0);
+        cpu_rst         : in  std_logic;  -- reset synchrone qui vient du programmeur
+        cpu_out_en      : in  std_logic;  -- désactivation des sorties pour laisser le programmeur écrire
+
+        en_mem          : out std_logic;
+        R_W             : out std_logic;
+        address         : out std_logic_vector (address_size-1 downto 0);
         data_in         : in  std_logic_vector (data_size-1 downto 0);
         data_out        : out std_logic_vector (data_size-1 downto 0)
         );
@@ -25,23 +29,6 @@ end entity;
 
 
 architecture rtl of top_CPU is
-
-    component RAM is
-    generic (
-        data_size    : integer := 8; -- Taille de chaque mot stocké
-        address_size : integer := 6  -- Largeur du signal d'adresses
-        );
-    port (
-        clk      : in  std_logic;
-        clk_en   : in  std_logic;
-
-        R_W      : in  std_logic;
-        address  : in  std_logic_vector (address_size -1 downto 0);
-
-        data_in  : in  std_logic_vector (data_size -1 downto 0);
-        data_out : out std_logic_vector (data_size -1 downto 0)
-        );
-    end component;
 
     component UT is
     generic (
@@ -103,7 +90,7 @@ architecture rtl of top_CPU is
 
     end component;
 
-    signal address      : std_logic_vector(address_size-1 downto 0);
+    --signal address      : std_logic_vector(address_size-1 downto 0);
     signal data_RAM_out : std_logic_vector(data_size-1 downto 0);
     signal data_RAM_in  : std_logic_vector(data_size-1 downto 0);
 
@@ -118,27 +105,12 @@ architecture rtl of top_CPU is
     signal carry        : std_logic;
 
     -- RAM
-    signal en_mem       : std_logic;
-    signal R_W          : std_logic;
+   -- signal en_mem       : std_logic;
+   -- signal R_W          : std_logic;
 
 
 begin
 
-inst_RAM : RAM
-    generic map(
-        data_size    => data_size,
-        address_size => address_size
-    )
-    port map(
-        clk      => clk,
-        clk_en   => clk_en,
-
-        R_W      => R_W,
-        address  => address,
-
-        data_in  => data_RAM_in,
-        data_out => data_RAM_out
-        );
 
 inst_ut : UT
     generic map(
@@ -151,8 +123,8 @@ inst_ut : UT
         clk      => clk,
         clk_en   => clk_en,
 
-        data_in  => data_RAM_out,
-        data_out => data_RAM_in,
+        data_in  => data_in,
+        data_out => data_out,
 
         carry    => carry,
 
@@ -177,7 +149,7 @@ inst_uc :  UC
         clk_en   => clk_en,
 
 
-        data_in     => data_RAM_out,
+        data_in     => data_in,
         address_out => address,
 
         -- Registres de la partie UT
@@ -195,9 +167,5 @@ inst_uc :  UC
         R_W      => R_W
         );
 
-
-addr         <= address;
-data_mem_in  <= data_RAM_out;
-data_mem_out <= data_RAM_in;
 
 end architecture;
