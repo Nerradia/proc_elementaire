@@ -24,14 +24,14 @@ end entity RAM;
 architecture rtl of RAM is 
 
     type tableau_memoire is array (integer range <>) of std_logic_vector(data_size -1 downto 0);
-    signal memoire : tableau_memoire(0 to 2**address_size-1) :=
-        (x"11", x"15", x"52", x"54",
-         x"C9", x"94", x"51", x"CD",
-         x"C0", x"13", x"52", x"95",
-         x"C0", x"CD", x"00", x"00",
-         x"00", x"FF", x"01", x"00",
-         x"28", x"18",
-         others => (others => '0')); --  PGCD du prof
+    signal memoire : tableau_memoire(0 to 2**address_size-1) := (
+      --   x"11", x"15", x"52", x"54",
+      --   x"C9", x"94", x"51", x"CD",
+      --   x"C0", x"13", x"52", x"95",
+      --   x"C0", x"CD", x"00", x"00",
+      --   x"00", x"FF", x"01", x"00",
+      --   x"28", x"18",
+         others => (others => '0')); 
 
     -- (x"08", x"47", x"86", x"C4", x"C4", x"00", x"00", x"7E", x"FE", others => (others => '0'));
 

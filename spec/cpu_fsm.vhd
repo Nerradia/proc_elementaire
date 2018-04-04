@@ -13,6 +13,8 @@ entity FSM is
         clk      : in  std_logic;
         clk_en   : in  std_logic;
 
+        cpu_init :  in std_logic; -- Du programmeur
+
         -- Compteur 
         init_cpt : out std_logic;
         en_cpt   : out std_logic;
@@ -23,6 +25,7 @@ entity FSM is
 
         -- Registres (et la bascule FF)
         init_ff  : out std_logic;
+        init_acc : out std_logic;
         load_ff  : out std_logic;
         load_ri  : out std_logic;
         load_rd  : out std_logic;
@@ -94,11 +97,12 @@ begin
         case state is 
 
         when INIT =>
-            init_cpt <= '0';
+            init_cpt <= '1';
+            init_acc <= '1';
             en_cpt   <= '0';
             load_cpt <= '0';
             sel_mux  <= '0';
-            init_ff  <= '0';
+            init_ff  <= '1';
             load_ff  <= '0';
             load_ri  <= '0';
             load_rd  <= '0';
@@ -114,6 +118,7 @@ begin
             R_W      <= '0';
 
             init_cpt <= '0';
+            init_acc <= '0';
             load_cpt <= '0';
             sel_mux  <= '0';
             init_ff  <= '0';
@@ -126,6 +131,7 @@ begin
             sel_mux  <= '1';
 
             init_cpt <= '0';
+            init_acc <= '0';
             en_cpt   <= '0';
             load_cpt <= '0';
             init_ff  <= '0';
@@ -144,6 +150,7 @@ begin
             load_rd  <= '1';
 
             init_cpt <= '0';
+            init_acc <= '0';
             en_cpt   <= '0';
             load_cpt <= '0';
             init_ff  <= '0';
@@ -159,6 +166,7 @@ begin
             load_ff  <= op_code(0);
 
             init_cpt <= '0';
+            init_acc <= '0';
             en_cpt   <= '0';
             load_cpt <= '0';
             init_ff  <= '0';
@@ -173,6 +181,7 @@ begin
             R_W      <= '1';
 
             init_cpt <= '0';
+            init_acc <= '0';
             en_cpt   <= '0';
             load_cpt <= '0';
             init_ff  <= '0';
@@ -189,6 +198,7 @@ begin
             load_ri  <= '1';
 
             init_cpt <= '0';
+            init_acc <= '0';
             en_cpt   <= '0';
             load_ff  <= '0';
             load_rd  <= '0';
@@ -208,10 +218,15 @@ begin
             state <= INIT;
 
         elsif rising_edge(clk) then
+          if cpu_init = '1' then
+            state <= INIT;
+
+          else
             if clk_en = '1' then
                 state <= next_state;
                 
             end if;
+          end if;
         end if;
     end process;
 

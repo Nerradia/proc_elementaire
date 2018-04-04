@@ -15,6 +15,7 @@ entity UC is
         clk      : in  std_logic;
         clk_en   : in  std_logic;
 
+        cpu_init : in  std_logic;
 
         data_in     : in  std_logic_vector(data_size-1 downto 0);
         address_out : out std_logic_vector(address_size-1 downto 0);
@@ -22,6 +23,7 @@ entity UC is
 
         -- Registres de la partie UT
         init_ff  : out std_logic;
+        init_acc : out std_logic;
         load_ff  : out std_logic;
         load_rd  : out std_logic;
         load_ra  : out std_logic;
@@ -79,6 +81,8 @@ architecture rtl of UC is
         clk      : in  std_logic;
         clk_en   : in  std_logic;
 
+        cpu_init : in  std_logic;
+
         -- Compteur 
         init_cpt : out std_logic;
         en_cpt   : out std_logic;
@@ -89,6 +93,7 @@ architecture rtl of UC is
 
         -- Registres (et la bascule FF)
         init_ff  : out std_logic;
+        init_acc : out std_logic;
         load_ff  : out std_logic;
         load_ri  : out std_logic;
         load_rd  : out std_logic;
@@ -145,6 +150,9 @@ inst_fsm : fsm
         clk      => clk,
         clk_en   => clk_en,
 
+        -- RAZ synchrone du programmeur
+        cpu_init => cpu_init,
+
         -- Compteur 
         init_cpt => init_cpt,
         en_cpt   => en_cpt,
@@ -155,6 +163,7 @@ inst_fsm : fsm
 
         -- Registres (et la bascule FF)
         init_ff  => init_ff,
+        init_acc => init_acc,
         load_ff  => load_ff,
         load_ri  => load_ri,
         load_rd  => load_rd,
