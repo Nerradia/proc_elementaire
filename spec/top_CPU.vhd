@@ -9,15 +9,16 @@ entity top_CPU is
         sel_ual_size : integer := 1;    -- Taille du sélectionneur d'opération de l'UAL
         data_size    : integer := 8;    -- Taille de chaque mot stocké
         address_size : integer := 6     -- Largeur de l'adresse
-        );                                  -- Attention, op_code + address_size doivent valoir data_size !
+        );                              -- Attention, op_code + address_size doivent valoir data_size !
     port (
         reset           : in  std_logic;
         clk             : in  std_logic;
         clk_en          : in  std_logic;
+        cpu_out_en      : in  std_logic;
 
         addr            : out std_logic_vector (address_size-1 downto 0);
-        data_mem_in     : out std_logic_vector (data_size-1 downto 0);
-        data_mem_out    : out std_logic_vector (data_size-1 downto 0)
+        data_in         : in  std_logic_vector (data_size-1 downto 0);
+        data_out        : out std_logic_vector (data_size-1 downto 0)
         );
 
 end entity;
