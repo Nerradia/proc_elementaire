@@ -48,10 +48,8 @@
 #define TGT 5
 #define TLT 6
 #define TEQ 7
-#define VAR 8
 
 #define VALUE_LENGTH 8
-#define INSTRUCTION_LENGTH 3
 
 enum FSM {
   INSTRUCT,
@@ -69,7 +67,6 @@ int decode_instruction(char * instruction) {
   if( ! strcmp(instruction, "TGT") ) return TGT; //greater than
   if( ! strcmp(instruction, "TLT") ) return TLT; //lower than
   if( ! strcmp(instruction, "TEQ") ) return TEQ; //equal
-  if( ! strcmp(instruction, "VAR") ) return VAR; //equal
 }
 
 int main(int argc, char const *argv[])
@@ -78,7 +75,7 @@ int main(int argc, char const *argv[])
   if(argc <= 1) {
     printf("You should use this program with the following arguments :\n");
     printf("\t ./dtm input_file target_serial_port \n");
-    printf("\t example : ./asm input_file.asm outputfile.bytes \n");
+    printf("\t example : ./compile input_file.bag outputfile.asm \n");
     return -1;
   } 
 
@@ -113,7 +110,6 @@ int main(int argc, char const *argv[])
   char outputHex[5] = "";
 
   int n = 1;
-  int index_ram;
   while (n > 0) {
     switch(state) {
       case INSTRUCT:
@@ -126,11 +122,7 @@ int main(int argc, char const *argv[])
         state = VALUE;
         break;
       case VALUE:
-        if(ins != VAR) {
-          n = read (in_f, &value, VALUE_LENGTH);
-        } else {
-          n = read (in_f, &value, VALUE_LENGTH + INSTRUCTION_LENGTH);
-        }
+        n = read (in_f, &value, VALUE_LENGTH);
         val = atoi(value);
         state = EOL;
         break;
@@ -151,7 +143,6 @@ int main(int argc, char const *argv[])
       default:  
       break;
     }
-    index_ram ++;
   }
 
   close(in_f);

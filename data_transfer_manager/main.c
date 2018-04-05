@@ -138,9 +138,9 @@ int main(int argc, char const *argv[])
     switch(temp) {
       case '\n':
         value = (uint32_t)strtol(buffer, NULL, 0);
-        if(value > 0) {
+        //if(value > 0) {
           data[i++] = value;
-        }
+        //}
         strcpy(buffer,  "0x");
         break;
       default:
