@@ -67,13 +67,13 @@ begin
 
           -- On enregistre l'octet qui vient d'arriver au bon endroit
           case compteur is 
-            when 3 => 
-              coming_word(7 downto 0) <= uart_byte;
-            when 2 => 
-              coming_word(15 downto 8) <= uart_byte;
-            when 1 => 
-              coming_word(23 downto 16) <= uart_byte;
             when 0 => 
+              coming_word(7 downto 0) <= uart_byte;
+            when 1 => 
+              coming_word(15 downto 8) <= uart_byte;
+            when 2 => 
+              coming_word(23 downto 16) <= uart_byte;
+            when 3 => 
               coming_word(31 downto 24) <= uart_byte;
           end case;
 
