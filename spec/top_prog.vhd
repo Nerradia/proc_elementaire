@@ -7,7 +7,7 @@ entity top_prog is
   generic (
     data_size    : integer := 8;    -- Taille de chaque mot stocké
     address_size : integer := 6;     -- Largeur de l'adresse
-    clk_div      : integer := 868        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
+    clk_div      : integer := 347        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
   );
   port (
     clk       : in  std_logic;
@@ -33,7 +33,7 @@ architecture rtl of top_prog is
   component uart_to_parallel is
     generic (
       data_size    : integer := 8;          -- Taille de chaque mot stocké dans la RAM
-      clk_div      : integer := 868        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
+      clk_div      : integer := 347        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
     );
     port (
       clk                 : in  std_logic;

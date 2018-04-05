@@ -20,7 +20,7 @@ use ieee.numeric_std.all;
  
 entity uart_receiver is
   generic (
-      clk_div : integer := 868     -- Needs to be set correctly
+      clk_div : integer := 347     -- Needs to be set correctly
   );
   port (
     clk                 : in  std_logic;

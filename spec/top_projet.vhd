@@ -9,7 +9,7 @@ entity top_projet is
       sel_ual_size : integer := 1;    -- Taille du sélectionneur d'opération de l'UAL
       data_size    : integer := 8;    -- Taille de chaque mot stocké
       address_size : integer := 6;     -- Largeur de l'adresse
-      clk_div      : integer := 868    -- diviseur de l'horloge du fpga pour le port série de la programmation, défaut à 115200 Bauds avec clk à 100 MHz
+      clk_div      : integer := 347    -- diviseur de l'horloge du fpga pour le port série de la programmation, défaut à 115200 Bauds avec clk à 25 MHz
     );                                -- Attention, op_code + address_size doivent valoir data_size !
     port (
       clk             : in  STD_LOGIC;
@@ -75,7 +75,7 @@ architecture rtl of top_projet is
     generic (
       data_size    : integer := 8;    -- Taille de chaque mot stocké
       address_size : integer := 6;     -- Largeur de l'adresse
-      clk_div      : integer := 868        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
+      clk_div      : integer := 347        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
     );
     port (
       clk       : in  std_logic;

@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 entity uart_to_parallel is
   generic (
     data_size    : integer := 8;    -- Taille de chaque mot stocké dans la RAM
-    clk_div      : integer := 868        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
+    clk_div      : integer := 347        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
   );
   port (
     clk                 : in  std_logic;
@@ -21,7 +21,7 @@ architecture uart of uart_to_parallel is
 
   component uart_receiver is
     generic (
-        clk_div : integer := 868
+        clk_div : integer := 347
     );
     port (
       clk                 : in  std_logic;
@@ -67,13 +67,13 @@ begin
 
           -- On enregistre l'octet qui vient d'arriver au bon endroit
           case compteur is 
-            when 0 => 
-              coming_word(7 downto 0) <= uart_byte;
-            when 1 => 
-              coming_word(15 downto 8) <= uart_byte;
-            when 2 => 
-              coming_word(23 downto 16) <= uart_byte;
             when 3 => 
+              coming_word(7 downto 0) <= uart_byte;
+            when 2 => 
+              coming_word(15 downto 8) <= uart_byte;
+            when 1 => 
+              coming_word(23 downto 16) <= uart_byte;
+            when 0 => 
               coming_word(31 downto 24) <= uart_byte;
           end case;
 

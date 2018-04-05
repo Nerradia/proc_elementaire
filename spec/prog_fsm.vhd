@@ -23,8 +23,8 @@ end entity prog_fsm;
 
 architecture rtl of prog_fsm is
     type STATES is (IDLE, PROGRAMMATION); 
-    signal state      : STATES;
-    signal next_state : STATES;
+    signal state      : STATES := IDLE;
+    signal next_state : STATES := IDLE;
 
     signal prog_btn_r_r : std_logic := '0';
     signal prog_btn_r   : std_logic := '0';
@@ -53,11 +53,15 @@ NEXTSTATE : process(state, cpt_out, prog_btn_r_r) is
     when IDLE => -- Programmeur en veille, on attend d'avoir l'ordre via le bouton
       if prog_btn_r_r = '1' then
         next_state <= PROGRAMMATION;
+      else 
+        next_state <= IDLE;
       end if;
 
     when PROGRAMMATION =>
       if cpt_out >= 2**address_size - 1 then
         next_state <= IDLE;
+      else 
+        next_state <= PROGRAMMATION;
       end if;
       
     when others =>
