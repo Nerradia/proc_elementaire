@@ -86,6 +86,8 @@ int main(int argc, char const *argv[])
     return -1;
   } 
 
+  printf("Beginning of the program\n");
+
   const char * input_file = argv[1];
   int in_f = open(input_file,  O_RDONLY);
 
@@ -120,6 +122,8 @@ int main(int argc, char const *argv[])
   char outputHex[5] = "";
 
   int n = 1;
+  int counter = 0;
+  char file_readed[10000] = "";
 
   while (n > 0) {
     switch(state) {
@@ -128,26 +132,30 @@ int main(int argc, char const *argv[])
         ins = -1;
         n = read (in_f, instruction, INSTRUCTION_LENGTH);
         ins = decode_instruction(instruction);
-        printf("Instruction : %s", instruction);
+        sprintf(file_readed, "%s%s", file_readed, instruction);
 
         state = SPACE;
         break;
       case SPACE:
-        n = read (in_f, instruction, 1);
-        printf(" ");
+        n = read (in_f, &temp, 1);
+        sprintf(file_readed, "%s%c", file_readed, temp);
+
         state = VALUE;
         break;
       case VALUE:
         strcpy( value, "");
         if(ins != VAR) {
           n = read (in_f, value, VALUE_LENGTH);
+        sprintf(file_readed, "%s%s", file_readed, value);
+
           value[n] = 0;
         } else {
           n = read (in_f, value, VAR_LENGTH);
+          sprintf(file_readed, "%s%s", file_readed, value);
+
           value[n] = 0;
         }
         value[n] = 0;
-        printf("%s \n", value);
 
         val = atoi (value);
         state = EOL;
@@ -155,6 +163,8 @@ int main(int argc, char const *argv[])
       case EOL:
         n = read (in_f, &temp, 1);
         if( temp == '\n') {
+          sprintf(file_readed, "%s\n", file_readed);
+
           //overflow security
           val = val & (VALUE_LENGTH * VALUE_LENGTH - 1);
           if(ins != VAR) {
@@ -163,10 +173,13 @@ int main(int argc, char const *argv[])
             output = val;
           }
 
-          printf("%03u = %03x\n",output, output );
-          sprintf(outputHex, "%03x\n", output);
-          write(out_f, outputHex, strlen(outputHex));
-
+          printf( "instruction %d:\t %03u \t(dec) = %03x (hex)\n", 
+                  counter, 
+                  output, 
+                  output );
+          sprintf( outputHex, "%03x\n", output);
+          write( out_f, outputHex, strlen(outputHex));
+          counter ++;
           state = INSTRUCT;
         }
         break;
@@ -174,7 +187,10 @@ int main(int argc, char const *argv[])
       break;
     }
   }
-  printf("fin du programme\n");
+  //printf("Fichier lu: \n%s\n", file_readed);
+
+  printf("End of program\n");
+
   flock(in_f, LOCK_UN);
   flock(out_f, LOCK_UN);
   close(in_f);
