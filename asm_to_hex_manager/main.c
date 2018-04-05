@@ -52,6 +52,8 @@
 
 #define VALUE_LENGTH 8
 #define INSTRUCTION_LENGTH 3
+//usually, VAR LENGTH = VALUE_LENGTH + INSTRUCTION_LENGTH
+#define VAR_LENGTH 11 
 
 enum FSM {
   INSTRUCT,
@@ -103,14 +105,14 @@ int main(int argc, char const *argv[])
 
   int state = INSTRUCT;
   char instruction [3] = "";
-  char value [VALUE_LENGTH];
+  char value [VAR_LENGTH];
   char temp;
 
   int ins = 0;
   int val = 0;
 
   int output = 0;
-  char outputHex[5] = "";
+  char outputHex[5];
 
   int n = 1;
   int index_ram;
@@ -139,8 +141,11 @@ int main(int argc, char const *argv[])
         if( temp == '\n') {
           //overflow security
           val = val & (VALUE_LENGTH * VALUE_LENGTH - 1);
+          if(ins != VAR)
+            output = ins << VALUE_LENGTH | val;
+          else
+            output = val;
 
-          output = ins << VALUE_LENGTH | val;
           printf("%03x\n", output );
           sprintf(outputHex, "%03x\n", output);
           write(out_f, outputHex, strlen(outputHex));
@@ -153,9 +158,9 @@ int main(int argc, char const *argv[])
     }
     index_ram ++;
   }
-
+  
   close(in_f);
   close(out_f);
-
+  
   return 0;
 }

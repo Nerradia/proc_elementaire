@@ -3,28 +3,17 @@
  *  With the kind collaboration of : Julien BESSE
  *  Date : 04/04/2018
  *  OS : Linux
- *                            _/_/      _/_/_/  _/      _/ 
- *                         _/    _/  _/        _/_/  _/_/  
- *                        _/_/_/_/    _/_/    _/  _/  _/   
- *                       _/    _/        _/  _/      _/    
- *                      _/    _/  _/_/_/    _/      _/     
+ *               ____ ___  __  __ ____ ___ _     _____ ____
+ *              / ___| _ \|  \/  |  _ \_ _| |   | ____|  _ \
+ *             | |  | | | | |\/| | |_) | || |   |  _| | |_) |
+ *             | |___ |_| | |  | |  __/| || |___| |___|  _ < 
+ *              \____|___/|_|  |_|_|  |___|_____|_____|_| \_\
  *
- *                           _/_/_/_/_/    _/_/  
- *                              _/      _/    _/ 
- *                             _/      _/    _/  
- *                            _/      _/    _/   
- *                           _/        _/_/      
  *
- *                      _/    _/  _/_/_/_/  _/      _/
- *                     _/    _/  _/          _/  _/   
- *                    _/_/_/_/  _/_/_/        _/      
- *                   _/    _/  _/          _/  _/     
- *                  _/    _/  _/_/_/_/  _/      _/    
- *                                                    
  *
- *    The goal of this program is to convert a program written in language 
- *  assembly to hexa, ready to put in the RAM of the processor we have created.
- * Usage: ./asm input_file.asm outputfile.bytes
+ *    The goal of this program is to compile a code written in language 
+ *  baguette to assembly.
+ * Usage: ./compiler input_file.bag outputfile.asm
  ******************************************************************************/
 
 #include <errno.h>
@@ -38,18 +27,6 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-
-//description of the language
-#define NOR 0
-#define ADD 1
-#define STA 2
-#define JCC 3
-#define JMP 4
-#define TGT 5
-#define TLT 6
-#define TEQ 7
-
-#define VALUE_LENGTH 8
 
 enum FSM {
   INSTRUCT,
