@@ -55,24 +55,6 @@ architecture rtl of top_projet is
       );
   end component;
 
-/*
-  component RAM is
-    generic (
-      data_size    : integer := 8; -- Taille de chaque mot stocké
-      address_size : integer := 6  -- Largeur du signal d'adresses
-      );
-    port (
-      clk      : in  std_logic;
-      clk_en   : in  std_logic;
-
-      R_W      : in  std_logic;
-      address  : in  std_logic_vector (address_size -1 downto 0);
-      data_in  : in  std_logic_vector (data_size -1 downto 0);
-      data_out : out std_logic_vector (data_size -1 downto 0)
-      );
-  end component;
-*/
-
   component top_prog is 
     generic (
       data_size    : integer := 8;    -- Taille de chaque mot stocké
@@ -119,23 +101,6 @@ architecture rtl of top_projet is
   signal cpu_init           : std_logic;
 
 begin
-
-/*
-inst_RAM : RAM
-    generic map(
-        data_size    => data_size,
-        address_size => address_size
-    )
-    port map(
-      clk      => clk,
-
-      -- Bus
-      clk_en   => cpu_bus_en_mem,
-      R_W      => cpu_bus_R_W,
-      address  => cpu_bus_address,
-      data_in  => cpu_bus_data_out,  -- Ici on croise les signaux, (data out du bus = sortie du maitre, donc entrée de la RAM)
-      data_out => cpu_bus_data_in
-    );*/
 
 int_ram_cpu : blk_mem_gen_0
   port map ( 
