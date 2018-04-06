@@ -35,6 +35,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <math.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -51,10 +52,13 @@
 #define TEQ 7
 #define VAR 8
 
-#define VALUE_LENGTH 8
-#define INSTRUCTION_LENGTH 3
-//usually, VAR LENGTH = VALUE_LENGTH + INSTRUCTION_LENGTH
-#define VAR_LENGTH 11 
+#define INSTR_HEX_LENGTH 3
+#define ADD_HEX_LENGTH 5
+#define VAR_HEX_LENGTH 7
+
+
+#define INSTR_BIN_LENGTH 5
+#define VALUE_BIN_LENGTH 20
 
 enum FSM {
   INSTRUCT,
@@ -112,7 +116,7 @@ int main(int argc, char const *argv[])
 
   int state = INSTRUCT;
   char instruction [3] = "";
-  char value [VAR_LENGTH] = "";
+  char value [VAR_HEX_LENGTH + 2] = "";
   char temp = ' ';
 
   int ins = 0;
@@ -130,7 +134,7 @@ int main(int argc, char const *argv[])
       case INSTRUCT:
         strcpy(instruction, "");
         ins = -1;
-        n = read (in_f, instruction, INSTRUCTION_LENGTH);
+        n = read (in_f, instruction, INSTR_HEX_LENGTH);
         ins = decode_instruction(instruction);
         sprintf(file_readed, "%s%s", file_readed, instruction);
 
@@ -145,39 +149,39 @@ int main(int argc, char const *argv[])
       case VALUE:
         strcpy( value, "");
         if(ins != VAR) {
-          n = read (in_f, value, VALUE_LENGTH);
-        sprintf(file_readed, "%s%s", file_readed, value);
-
-          value[n] = 0;
-        } else {
-          n = read (in_f, value, VAR_LENGTH);
+          n = read (in_f, value, ADD_HEX_LENGTH);
           sprintf(file_readed, "%s%s", file_readed, value);
 
-          value[n] = 0;
-        }
-        value[n] = 0;
+          //value[n] = 0;
+        } else {
+          n = read (in_f, value, VAR_HEX_LENGTH);
+          sprintf(file_readed, "%s%s", file_readed, value);
 
-        val = atoi (value);
+          //value[n] = 0;
+        }
+
         state = EOL;
         break;
       case EOL:
         n = read (in_f, &temp, 1);
         if( temp == '\n') {
-          sprintf(file_readed, "%s\n", file_readed);
+          sprintf ( file_readed, "%s\n", file_readed );
+
+          val = (int)strtol(value, NULL, 16);;
 
           //overflow security
-          val = val & (VALUE_LENGTH * VALUE_LENGTH - 1);
+          val = val & ((int)pow(2,VALUE_BIN_LENGTH) - 1);
+
           if(ins != VAR) {
-            output = ins << VALUE_LENGTH | val;
+            output = ins << VALUE_BIN_LENGTH | val;
           } else {
             output = val;
           }
 
-          printf( "instruction %d:\t %03u \t(dec) = %03x (hex)\n", 
+          printf( "instruction %d:\t %06x\t(hex)\n", 
                   counter, 
-                  output, 
                   output );
-          sprintf( outputHex, "%03x\n", output);
+          sprintf( outputHex, "%06u\n", output);
           write( out_f, outputHex, strlen(outputHex));
           counter ++;
           state = INSTRUCT;
