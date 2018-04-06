@@ -18,32 +18,69 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <iterator>
+#include <map>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
 #include <termios.h>
 #include <unistd.h>
-#include <stdint.h>
+#include <vector>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 
-enum FSM {
-  INSTRUCT,
-  SPACE,
-  VALUE,
-  EOL
-};
+#include "instruction.h"
+#include "variable.h"
 
-int decode_instruction(char * instruction) {
-  if( ! strcmp(instruction, "NOR") ) return NOR;
-  if( ! strcmp(instruction, "ADD") ) return ADD;
-  if( ! strcmp(instruction, "STA") ) return STA;
-  if( ! strcmp(instruction, "JCC") ) return JCC;
-  if( ! strcmp(instruction, "JMP") ) return JMP; //jump
-  if( ! strcmp(instruction, "TGT") ) return TGT; //greater than
-  if( ! strcmp(instruction, "TLT") ) return TLT; //lower than
-  if( ! strcmp(instruction, "TEQ") ) return TEQ; //equal
+/* list of instructions available
+  NOR
+  ADD
+  STA
+  JCC
+  JMP //jump
+  TGT //greater than
+  TLT //lower than
+  TEQ //equal
+  VAR //equal
+*/
+
+enum {
+  ADD_VAR,
+  ADDITION
+}; //instructionType;
+
+
+int readLine (int file, std::string *line, instruction ins) {
+
+  return 0;
+}
+
+std::string ReplaceAll( std::string str, 
+                        const std::string& from, 
+                        const std::string& to ) {
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+    return str;
+}
+
+std::string find_name(std::string str) {
+  unsigned first = str.find("r") + 1;
+  unsigned last = str.find(";");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string variable_to_change(std::string str) {
+  unsigned last = str.find("=");
+  std::string strNew = str.substr (0, last);
+  return strNew;
 }
 
 int main(int argc, char const *argv[])
@@ -57,9 +94,9 @@ int main(int argc, char const *argv[])
   } 
 
   const char * input_file = argv[1];
-  int in_f = open(input_file,  O_RDONLY);
+  std::ifstream in_f( input_file );
 
-  if (in_f < 0) {
+  if (!in_f.is_open()) {
     printf ("error %d opening %s: %s \n", errno, input_file, strerror (errno));
     return -1;
   }
@@ -73,56 +110,52 @@ int main(int argc, char const *argv[])
     return -1;
   }
 
+  std::string line = "";
+  instruction ins;
+
+  std::vector<var> v;
   //parser
+  for( std::string line; getline( in_f, line ); ) {
+    printf("%s\n",line.c_str());
+    line = ReplaceAll(line, " ", "");
 
-  int state = INSTRUCT;
-  char instruction [3] = "";
-  char value [VALUE_LENGTH];
-  char temp;
+    if ( line.find("entier") != std::string::npos ) {
+      ins.type = ADD_VAR;
+      printf( "=> Ajout de variable \n" );
 
-  int ins = 0;
-  int val = 0;
+      var var_;
+      var_.name = find_name(line);
+      var_.value = 0;
+      v.push_back(var_);
 
-  int output = 0;
-  char outputHex[5] = "";
+      printf("nom de la variable : %s\n", var_.name.c_str());
 
-  int n = 1;
-  while (n > 0) {
-    switch(state) {
-      case INSTRUCT:
-        n = read (in_f, instruction, 3);
-        ins = decode_instruction(instruction);
-        state = SPACE;
-        break;
-      case SPACE:
-        n = read (in_f, instruction, 1);
-        state = VALUE;
-        break;
-      case VALUE:
-        n = read (in_f, &value, VALUE_LENGTH);
-        val = atoi(value);
-        state = EOL;
-        break;
-      case EOL:
-        n = read (in_f, &temp, 1);
-        if( temp == '\n') {
-          //overflow security
-          val = val & (VALUE_LENGTH * VALUE_LENGTH - 1);
+    } else if ( line.find("+", 0) != std::string::npos ) {
+      ins.type = ADDITION;
+      //ins.setArgument1();
+      printf( "=> Addition\n");
+      printf("variable_to_change : %s\n", variable_to_change(line).c_str() );
 
-          output = ins << VALUE_LENGTH | val;
-          printf("%03x\n", output );
-          sprintf(outputHex, "%03x\n", output);
-          write(out_f, outputHex, strlen(outputHex));
+    } else if ( line.find("-") != std::string::npos ) {
+      printf("=> Soustraction\n");
 
-          state = INSTRUCT;
-        }
-        break;
-      default:  
-      break;
+    } else if ( line.find("=") != std::string::npos ) {
+      printf("=> affectation \n");
+
+    } else {
+      printf("==> autre ? \n");
     }
   }
+  uint32_t index_ram = 0;
+  //gestion des instructions
 
-  close(in_f);
+  //gestion des variables
+  for (unsigned int i = 0; i < v.size(); ++i) {
+    printf("%d VAR %d\n", index_ram, v[i].value);
+    index_ram++;
+  }
+
+  in_f.close();
   close(out_f);
 
   return 0;

@@ -1,0 +1,5 @@
+entier azerty;
+
+azerty = 9;
+a = a + 1;
+a = a - 1;
