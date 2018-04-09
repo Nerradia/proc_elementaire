@@ -39,7 +39,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define RAM_SIZE 64
+#define RAM_SIZE 8192
+#define CHUNK_SIZE 64 // Size of each chunk sent to FPGA, bigger is slower, but if it's too low, data will get lost
 
 int set_interface_attribs (int fd, int speed, int parity) {
   struct termios tty;
@@ -128,7 +129,7 @@ int main(int argc, char const *argv[])
   int32_t value = 0;
   unsigned int i = 0;
   int n = 1;
-  char buffer[5] = "";
+  char buffer[10] = "";
   strcpy(buffer, "0x");
 
   printf("Reading data from the file ...\n");
@@ -149,9 +150,15 @@ int main(int argc, char const *argv[])
     }
   }
   
-  printf("Sending data to the target ...\n");
-  write (fd, data, sizeof(int32_t) * RAM_SIZE);
-  printf("Done ...\n");
+  printf("Sending data to the target ...  00%%");
+  int ichunk;
+  for (ichunk = 0; ichunk < CHUNK_SIZE; ichunk++) {
+    write (fd, data + ichunk * (RAM_SIZE / CHUNK_SIZE), sizeof(int32_t) * (RAM_SIZE / CHUNK_SIZE));
+    printf("\b\b\b\b%3d%%", (100*ichunk)/CHUNK_SIZE);
+    fflush(stdout);
+    //sleep(0.01);
+  }
+  printf("\b\b\b\b\b 100 %%\nDone .\n");
 
   /*
   DEBUG PART - when the target is in broadcast
