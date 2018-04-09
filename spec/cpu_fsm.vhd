@@ -48,6 +48,7 @@ architecture rtl of FSM is
 
     constant OP_NOR : std_logic_vector (op_code_size-1 downto 0) := "00000";
     constant OP_ADD : std_logic_vector (op_code_size-1 downto 0) := "00001";
+    constant OP_OR  : std_logic_vector (op_code_size-1 downto 0) := "00010";
 
     type STATES is (INIT, FETCH_INST, DECODE, FETCH_OP, EXE_UAL, STA, EXE_JCC); 
     signal state : STATES;

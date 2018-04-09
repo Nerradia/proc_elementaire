@@ -31,6 +31,12 @@ begin
             when 0 => -- NOR
                 data_out_with_carry <= "0" & (data_A nor data_B);
 
+            when 2 => -- OR
+                data_out_with_carry <= "0" & (data_A or data_B);
+
+            when 3 => -- AND
+                data_out_with_carry <= "0" & (data_A and data_B);
+
             when 1 => -- ADDITION
                 data_out_with_carry <= std_logic_vector(unsigned("0" & data_A) + unsigned("0" & data_B));
 
