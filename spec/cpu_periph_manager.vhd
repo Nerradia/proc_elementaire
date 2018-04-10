@@ -45,7 +45,7 @@ begin
         when 16#80000# =>
           spi_en       <= '1';
 
-        when 16#80001# =>
+        when 16#80001# to 16#80002# =>
           gpio_ctrl_en <= '1';
 
         when others =>

@@ -25,7 +25,10 @@ entity gpio is
 
     -- Afficheur 8 x 7 segments
     sevenseg    : out std_logic_vector (6 downto 0);
-    sevenseg_an : out std_logic_vector (7 downto 0)
+    sevenseg_an : out std_logic_vector (7 downto 0);
+
+    -- Interrupteurs
+    switches    : in  std_logic_vector(15 downto 0)
   );
 end entity;
 
@@ -70,6 +73,19 @@ architecture rtl of gpio is
     );
   end component;
 
+  component gpio_switches is
+    generic (
+      data_size    : integer
+    );
+    port (
+      clk         : in  std_logic;
+        
+      value       : out std_logic_vector(data_size-1 downto 0);
+    
+      switches    : in  std_logic_vector(15 downto 0)
+    );  
+  end component;
+
   signal periph_data_in    : std_logic_vector(data_size-1 downto 0);
   signal periph_data_out   : std_logic_vector(data_size-1 downto 0);
   signal periph_address    : std_logic_vector(address_size-1 downto 0);
@@ -77,6 +93,7 @@ architecture rtl of gpio is
   signal periph_en         : std_logic;
   
   signal sevenseg_value    : std_logic_vector(data_size-1 downto 0);
+  signal switches_value    : std_logic_vector(data_size-1 downto 0);
 
 begin
 
@@ -112,8 +129,17 @@ begin
 
   elsif rising_edge(clk) then
     if periph_en = '1' then
-      sevenseg_value <= periph_data_in;
-      -- sevenseg_value <= (20 downto 0 => periph_address, others => '0');
+      case periph_address is
+      when x"80001" =>
+        sevenseg_value  <= periph_data_in;
+        periph_data_out <= sevenseg_value;
+
+      when x"80002" =>
+        periph_data_out <= switches_value;
+
+      when others   =>
+        
+      end case;
     end if;
   end if;
 end process;
@@ -129,6 +155,18 @@ inst_gpio_7seg : gpio_7seg
   
     sevenseg    => sevenseg,
     sevenseg_an => sevenseg_an
+  );
+
+inst_gpio_switches : gpio_switches
+  generic map (
+    data_size    => data_size
+  )
+  port map (
+    clk         => clk,
+      
+    value       => switches_value,
+  
+    switches    => switches
   );
 
 end architecture;
