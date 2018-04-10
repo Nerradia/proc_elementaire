@@ -3,6 +3,9 @@ use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
 
+ -- Main Author : Julien BESSE
+ -- With the kind collaboration of : Pierre JOUBERT
+
 entity top_projet is
     generic (
       op_code_size      : integer :=  5;    -- Largeur du signal des instructions
