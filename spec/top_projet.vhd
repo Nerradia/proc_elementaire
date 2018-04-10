@@ -44,7 +44,10 @@ entity top_projet is
       sevenseg             : out std_logic_vector (6 downto 0);
       sevenseg_an          : out std_logic_vector (7 downto 0);
 
-      switches             : in  std_logic_vector(15 downto 0)
+      switches             : in  std_logic_vector(15 downto 0);
+
+      -- LEDs
+      led_out     : out std_logic_vector(15 downto 0)
      );
 end entity;
 
@@ -139,7 +142,10 @@ architecture rtl of top_projet is
     sevenseg_an : out std_logic_vector (7 downto 0);
 
     -- Interrupteurs
-    switches    : in  std_logic_vector (15 downto 0)
+    switches    : in  std_logic_vector (15 downto 0);
+
+    -- LEDs
+    led_out     : out std_logic_vector(15 downto 0)
     );
   end component;
 
@@ -364,7 +370,9 @@ inst_ram_cpu : ram_simple
     sevenseg           => sevenseg,
     sevenseg_an        => sevenseg_an,
 
-    switches           => switches
+    switches           => switches,
+
+    led_out            => led_out
     );
 
 

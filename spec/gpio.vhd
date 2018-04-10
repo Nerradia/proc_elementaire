@@ -28,7 +28,10 @@ entity gpio is
     sevenseg_an : out std_logic_vector (7 downto 0);
 
     -- Interrupteurs
-    switches    : in  std_logic_vector(15 downto 0)
+    switches    : in  std_logic_vector(15 downto 0);
+
+    -- LEDs
+    led_out     : out std_logic_vector(15 downto 0)
   );
 end entity;
 
@@ -86,6 +89,19 @@ architecture rtl of gpio is
     );  
   end component;
 
+  component gpio_pwm_led is
+    generic (
+      data_size    : integer
+    );
+    port (
+      clk        : in  std_logic;
+        
+      value      : in  std_logic_vector(data_size-1 downto 0);
+    
+      led_out    : out std_logic
+    );
+  end component;
+
   signal periph_data_in    : std_logic_vector(data_size-1 downto 0);
   signal periph_data_out   : std_logic_vector(data_size-1 downto 0);
   signal periph_address    : std_logic_vector(address_size-1 downto 0);
@@ -94,6 +110,9 @@ architecture rtl of gpio is
   
   signal sevenseg_value    : std_logic_vector(data_size-1 downto 0);
   signal switches_value    : std_logic_vector(data_size-1 downto 0);
+
+  type tableau_valeurs is array (integer range <>) of std_logic_vector(data_size -1 downto 0);
+  signal pwm_values : tableau_valeurs(0 to 15) := (others => (others => '0'));
 
 begin
 
@@ -137,8 +156,56 @@ begin
       when x"80002" =>
         periph_data_out <= switches_value;
 
+      when x"80010" =>
+        pwm_values(0)<= periph_data_in;
+
+      when x"80011" =>
+        pwm_values(1)<= periph_data_in;
+
+      when x"80012" =>
+        pwm_values(2)<= periph_data_in;
+
+      when x"80013" =>
+        pwm_values(3)<= periph_data_in;
+
+      when x"80014" =>
+        pwm_values(4)<= periph_data_in;
+
+      when x"80015" =>
+        pwm_values(5)<= periph_data_in;
+
+      when x"80016" =>
+        pwm_values(6)<= periph_data_in;
+
+      when x"80017" =>
+        pwm_values(7)<= periph_data_in;
+
+      when x"80018" =>
+        pwm_values(8)<= periph_data_in;
+
+      when x"80019" =>
+        pwm_values(9)<= periph_data_in;
+
+      when x"8001a" =>
+        pwm_values(10)<= periph_data_in;
+
+      when x"8001b" =>
+        pwm_values(11)<= periph_data_in;
+
+      when x"8001c" =>
+        pwm_values(12)<= periph_data_in;
+
+      when x"8001d" =>
+        pwm_values(13)<= periph_data_in;
+
+      when x"8001e" =>
+        pwm_values(14)<= periph_data_in;
+
+      when x"8001f" =>
+        pwm_values(15)<= periph_data_in;
+
       when others   =>
-        
+
       end case;
     end if;
   end if;
@@ -168,6 +235,21 @@ inst_gpio_switches : gpio_switches
   
     switches    => switches
   );
+
+inst_pwm_led : for i in 0 to 15 generate
+    inst_pwm_led_i : gpio_pwm_led
+    generic map (
+      data_size   => data_size
+    )
+    port map (
+      clk        => clk,
+        
+      value      => pwm_values(i),
+    
+      led_out    => led_out(i)
+    );
+
+end generate;
 
 end architecture;
 
