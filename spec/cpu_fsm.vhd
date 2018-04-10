@@ -5,8 +5,8 @@ use IEEE.numeric_std.all;
 
 entity FSM is
     generic (
-            op_code_size : integer := 2;  -- Largeur du signal des instructions
-            sel_ual_size : integer := 1   -- Largeur du nombre d'instructions de l'UAL
+            op_code_size : integer;  -- Largeur du signal des instructions
+            sel_ual_size : integer   -- Largeur du nombre d'instructions de l'UAL
         );
     port (
         reset    : in  std_logic;
@@ -45,6 +45,11 @@ entity FSM is
 end entity FSM;
 
 architecture rtl of FSM is
+
+    constant OP_NOR : std_logic_vector (op_code_size-1 downto 0) := "00000";
+    constant OP_ADD : std_logic_vector (op_code_size-1 downto 0) := "00001";
+    constant OP_OR  : std_logic_vector (op_code_size-1 downto 0) := "00010";
+
     type STATES is (INIT, FETCH_INST, DECODE, FETCH_OP, EXE_UAL, STA, EXE_JCC); 
     signal state : STATES;
     signal next_state : STATES;
@@ -61,14 +66,17 @@ begin
             next_state <= DECODE;
 
         when DECODE =>
-            if op_code(1) = '0' then
+            if op_code(op_code_size-1) = '0' then -- MSB de l'op-code à 0 = Opération arithmétique ou logique 
                 next_state <= FETCH_OP;
 
-            elsif op_code = "10" then
+            elsif op_code = "10000" then
                 next_state <= STA;
 
-            elsif op_code = "11" then
+            elsif op_code = "10001" then
                 next_state <= EXE_JCC;
+                
+            else 
+                next_state <= FETCH_OP;
 
             end if;
 
@@ -161,9 +169,13 @@ begin
 
         when EXE_UAL =>
             sel_mux  <= '1';
-            sel_ual  <= op_code(0 downto 0);
+            sel_ual  <= op_code(sel_ual_size-1 downto 0);
             load_ra  <= '1';
-            load_ff  <= op_code(0);
+            if op_code = OP_ADD then
+              load_ff  <= '1';
+            else
+              load_ff  <= '0';  
+            end if;
 
             init_cpt <= '0';
             init_acc <= '0';

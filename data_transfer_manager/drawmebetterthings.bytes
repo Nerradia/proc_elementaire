@@ -1,0 +1,32 @@
+000000f
+010000c
+0100010
+0300011
+0200012
+100000c
+000000f
+0100013
+110000c
+110000c
+0000000
+0000000
+0080000
+1100000
+1100000
+1ffffff
+0000001
+00fffff
+1000000
+000000f
+
+> écrire l'instruction STA + adresse
+nor fffffff accu
+accu += l'instruction
+accu += 1
+and 00fffff pour virer ce qui tombe sur l'instruction
+or  1000000
+STA à l'adresse de l'instruction
+Accu <= 00000f
+exécuter l'instruction
+jcc local
+jcc vers ligne 2

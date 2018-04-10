@@ -5,14 +5,14 @@ use IEEE.numeric_std.all;
 
 entity prog_fsm is
     generic (
-      address_size : integer := 6  -- Largeur du signal d'adresses
+      ram_address_size : integer := 6  -- Largeur du signal d'adresses de la partie à programmer
     );
     port (
       reset    : in  std_logic;
       clk      : in  std_logic;
 
       prog_btn      : in  std_logic;
-      cpt_out       : in  std_logic_vector (address_size-1 downto 0);
+      cpt_out       : in  std_logic_vector (ram_address_size-1 downto 0);
       
       prog_status_led : out std_logic;
       clear           : out std_logic;
@@ -58,7 +58,7 @@ NEXTSTATE : process(state, cpt_out, prog_btn_r_r) is
       end if;
 
     when PROGRAMMATION =>
-      if cpt_out >= 2**address_size - 1 then
+      if cpt_out >= 2**ram_address_size - 1 then
         next_state <= IDLE;
       else 
         next_state <= PROGRAMMATION;
