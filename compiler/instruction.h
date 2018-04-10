@@ -12,6 +12,17 @@
 
 #include "variable.h"
 
+typedef enum {
+  ADDITION,
+  SOUSTRACTION,
+  AFFECTATION,
+  CONDITION,
+  FIN_CONDITION,
+  TANT_QUE,
+  FIN_TANT_QUE
+} INS_TYPE;
+
+
 class instruction
 {
 public:
@@ -19,20 +30,89 @@ public:
   ~instruction();
 
 public:
-  int type;
+  INS_TYPE type;
+  int nb_ins;
+  //only for conditions and loop
+  int num;
+  uint32_t address;
+  bool is_closed;
 
-private:
-  uint32_t argument1; 
-  uint32_t argument2; 
+protected:
+  var a1;
+  var a2;
+  var var_;
 
+public :
+  void set_argument1  (var variable);
+  void set_argument2  (var variable);
+  void set_return_var (var variable);
+
+  void set_address (uint32_t address);
+
+  virtual std::string print_instruction() = 0;
+};
+
+class addition : public instruction {
 public:
-  void set_argument1(int entier);
-  void set_argument1(var variable);
-  void set_argument2(int entier);
-  void set_argument2(var variable);
-  void ser_return_value(var variable);
+  addition();
+  ~addition();
+  std::string print_instruction();
+};
 
+class affectation : public instruction {
 public:
+  affectation();
+  ~affectation();
+  std::string print_instruction();
+};
+
+class soustraction : public instruction {
+public:
+  soustraction();
+  ~soustraction();
+  std::string print_instruction();
+};
+
+class condition : public instruction {
+public:
+  std::string condition_type;
+  condition();
+  ~condition();
+  void set_condition_type(std::string type);
+  std::string print_instruction();
+};
+
+class loop : public instruction {
+public:
+  std::string condition_type;
+  loop();
+  ~loop();
+  void set_condition_type(std::string type);
+  std::string print_instruction();
+};
+
+class endif : public instruction {
+public:
+  endif();
+  ~endif();
+  int endif_n;
+  uint32_t address_close;
+  std::string print_instruction();
+};
+
+class endloop : public instruction {
+public:
+  endloop();
+  ~endloop();
+  int endif_n;
+  uint32_t address_close;
+  std::string print_instruction();
+};
+
+class disp_screen : public instruction {
+public:
+  disp_screen();
+  ~disp_screen();
   std::string print_instruction();
 };
 

@@ -1,5 +1,9 @@
-entier azerty;
-
-azerty = 9;
+entier a;
+a = 0;
+afficher 1;
+tant_que (1 < 2)
 a = a + 1;
-a = a - 1;
+afficher a;
+fin_tant_que
+afficher a;
+

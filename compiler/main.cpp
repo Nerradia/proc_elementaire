@@ -36,6 +36,7 @@
 #include "instruction.h"
 #include "variable.h"
 
+#define MAX_RAM 0x8000
 /* list of instructions available
   NOR
   ADD
@@ -48,17 +49,13 @@
   VAR //equal
 */
 
-enum {
-  ADD_VAR,
-  ADDITION
-}; //instructionType;
-
-
-int readLine (int file, std::string *line, instruction ins) {
-
-  return 0;
+bool is_declared( std::string name, std::vector<var> var_v) {
+  for (unsigned int i = 0; i < var_v.size(); ++i) {
+    if ( var_v[i].name == name )
+      return true;
+  }
+  return false;
 }
-
 std::string ReplaceAll( std::string str, 
                         const std::string& from, 
                         const std::string& to ) {
@@ -68,6 +65,16 @@ std::string ReplaceAll( std::string str,
         start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
     }
     return str;
+}
+
+inline bool isInteger(const std::string & s)
+{
+   if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false ;
+
+   char * p ;
+   strtol(s.c_str(), &p, 10) ;
+
+   return (*p == 0) ;
 }
 
 std::string find_name(std::string str) {
@@ -82,6 +89,101 @@ std::string variable_to_change(std::string str) {
   std::string strNew = str.substr (0, last);
   return strNew;
 }
+
+std::string argument_addition_1 (std::string str) {
+  unsigned first = str.find("=") + 1;
+  unsigned last = str.find("+");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_addition_2 (std::string str) {
+  unsigned first = str.find("+") + 1;
+  unsigned last = str.find(";");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_soustraction_1 (std::string str) {
+  unsigned first = str.find("=") + 1;
+  unsigned last = str.find("-");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_soustraction_2 (std::string str) {
+  unsigned first = str.find("-") + 1;
+  unsigned last = str.find(";");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_affectation (std::string str) {
+  unsigned first = str.find("=") + 1;
+  unsigned last = str.find(";");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_condition1 (std::string str, std::string type) {
+  unsigned first = str.find("(") + 1;
+  unsigned last = str.find(type);
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_condition2 (std::string str, std::string type) {
+  unsigned first = str.find(type) + 1;
+  unsigned last = str.find(")");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string condition_type (std::string str) {
+  if (str.find(">")  != std::string::npos)
+    return ">";
+  if (str.find("<")  != std::string::npos)
+    return "<";
+  if (str.find("==") != std::string::npos)
+    return "==";
+
+//default, should not append
+  return "==";
+}
+
+int condition_to_close (std::vector<instruction*> & ins_v) {
+  for ( unsigned int i = ins_v.size() - 1; i > 0; i-- ) {
+    if(ins_v[i]->type == CONDITION)
+      if(! ins_v[i]->is_closed) {
+        ins_v[i]->is_closed = true;
+        return ins_v[i]->num;
+      }
+  }
+  return 0;
+}
+
+int loop_to_close (std::vector<instruction*> & ins_v) {
+  for ( unsigned int i = ins_v.size() - 1; i > 0; i-- ) {
+    if(ins_v[i]->type == TANT_QUE)
+      if(! ins_v[i]->is_closed) {
+        //ins_v[i]->is_closed = true;
+        return ins_v[i]->num;
+      }
+  }
+  return 0;
+}
+
+int loop_to_loop (std::vector<instruction*> & ins_v) {
+  for ( unsigned int i = ins_v.size() - 1; i > 0; i-- ) {
+    if(ins_v[i]->type == TANT_QUE)
+      if(! ins_v[i]->is_closed) {
+        ins_v[i]->is_closed = true;
+        return ins_v[i]->address;
+      }
+  }
+  return 0;
+}
+
 
 int main(int argc, char const *argv[])
 {
@@ -111,52 +213,232 @@ int main(int argc, char const *argv[])
   }
 
   std::string line = "";
-  instruction ins;
+  instruction * ins;
 
-  std::vector<var> v;
+  std::vector<var>            var_v;
+  std::vector<instruction*>   ins_v;
+  unsigned int cpt_cond = 0;
+  unsigned int cpt_loop = 0;
+
+  /*implementation of standard constants*/
+    var v;
+    // 0
+    v.name = "0";
+    v.value = 0;
+    var_v.push_back(v);
+    // 1
+    v.name = "1";
+    v.value = 1;
+    var_v.push_back(v);
+    // FF
+    v.name = "FFFFFFF";
+    v.value = 0xFFFFFFF;
+    var_v.push_back(v);
+
   //parser
-  for( std::string line; getline( in_f, line ); ) {
-    printf("%s\n",line.c_str());
+  while ( getline(in_f, line) ) {
+    printf ( "%s\n", line.c_str() );
     line = ReplaceAll(line, " ", "");
 
-    if ( line.find("entier") != std::string::npos ) {
-      ins.type = ADD_VAR;
-      printf( "=> Ajout de variable \n" );
+    if ( line.find("entier")    != std::string::npos ) {
+      v.name = find_name(line);
+      v.value = 0;
+      var_v.push_back(v);
 
-      var var_;
-      var_.name = find_name(line);
-      var_.value = 0;
-      v.push_back(var_);
+    } else if ( line.find("+")  != std::string::npos ) {
+      ins = new addition;
+      //first, find the variable to update
+      v.name = variable_to_change(line);
+      ins->set_return_var( v );
+      //then find the 2 arguments
+      v.name = argument_addition_1(line);
 
-      printf("nom de la variable : %s\n", var_.name.c_str());
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument1( v );
+      v.name = argument_addition_2(line);
 
-    } else if ( line.find("+", 0) != std::string::npos ) {
-      ins.type = ADDITION;
-      //ins.setArgument1();
-      printf( "=> Addition\n");
-      printf("variable_to_change : %s\n", variable_to_change(line).c_str() );
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument2( v );
+      ins_v.push_back(ins);
 
-    } else if ( line.find("-") != std::string::npos ) {
-      printf("=> Soustraction\n");
+    } else if ( line.find("-")  != std::string::npos ) {
+      ins = new soustraction;
+      //first, find the variable to update
+      v.name = variable_to_change(line);
+      ins->set_return_var( v );
+      //then find the 2 arguments
+      v.name = argument_soustraction_1(line);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument1( v );
+      v.name = argument_soustraction_2(line);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument2( v );
+      ins_v.push_back(ins);
+    
+    } else if ( line.find("fin_si") != std::string::npos ) {
+      ins = new endif;      
+      ins_v.push_back(ins);
 
-    } else if ( line.find("=") != std::string::npos ) {
-      printf("=> affectation \n");
+    } else if ( line.find("si") != std::string::npos ) {
+      condition *cond = new condition;
+      cond->set_condition_type ( condition_type (line) );
+      cond->num = cpt_cond++;
+      v.name = argument_condition1 (line, cond->condition_type);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      cond->set_argument1 ( v );
 
+      v.name = argument_condition2 (line, cond->condition_type);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      cond->set_argument2( v );
+
+      ins_v.push_back(cond);
+
+    } else if ( line.find("fin_tant_que")  != std::string::npos ) {
+      ins = new endloop;
+      cpt_loop--;
+      ins->num = cpt_loop;
+      ins_v.push_back(ins);
+
+    } else if ( line.find("tant_que")  != std::string::npos ) {
+      loop *lo = new loop;
+      lo->set_condition_type ( condition_type (line) );
+      lo->num = cpt_loop;
+      cpt_loop++;
+      v.name = argument_condition1 (line, lo->condition_type);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      lo->set_argument1 ( v );
+
+      v.name = argument_condition2 (line, lo->condition_type);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      lo->set_argument2( v );
+
+      ins_v.push_back(lo);
+
+    } else if ( line.find("afficher")  != std::string::npos ) {
+      ins = new disp_screen;
+      //first, find the variable to update
+      v.name = find_name(line);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument1( v );
+      ins_v.push_back(ins);
+
+    } else if ( line.find("=")  != std::string::npos ) {
+      ins = new affectation;
+      //first, find the variable to update
+      v.name = variable_to_change(line);
+      ins->set_return_var( v );
+      //then find the 2 arguments
+      v.name = argument_affectation(line);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument1( v );
+      ins_v.push_back(ins);
     } else {
-      printf("==> autre ? \n");
+      //printf("==> autre ? \n");
     }
   }
+  
+  std::string whole_file = "";
   uint32_t index_ram = 0;
-  //gestion des instructions
 
-  //gestion des variables
-  for (unsigned int i = 0; i < v.size(); ++i) {
-    printf("%d VAR %d\n", index_ram, v[i].value);
-    index_ram++;
+  //gestion des instructions
+  for ( unsigned int i = 0; i < ins_v.size(); ++i ) {
+    ins_v[i]->set_address(index_ram);
+    whole_file += ins_v[i]->print_instruction();
+    index_ram  += ins_v[i]->nb_ins;
+    
+    if (ins_v[i]->type == FIN_CONDITION) {
+      //we are in a condition
+      char temp1[30] = "";
+      char temp2[30] = "";
+      sprintf (temp1, ":condition(%d)", condition_to_close (ins_v));
+      sprintf (temp2, "%05x", index_ram);
+      whole_file = ReplaceAll (whole_file, std::string(temp1), std::string(temp2));
+    }
+
+    if (ins_v[i]->type == FIN_TANT_QUE) {
+       //we are in a condition
+      char temp1[30] = "";
+      char temp2[30] = "";
+      int toClose = loop_to_close(ins_v);
+      sprintf (temp1, ":endloop(%d)", toClose);
+      sprintf (temp2, "%05x", index_ram); //TODO: verify that
+      whole_file = ReplaceAll (whole_file, std::string(temp1), std::string(temp2));
+      sprintf (temp1, ":loop(%d)", toClose);
+      sprintf (temp2, "%05x", loop_to_loop(ins_v)); //TODO: verify that
+      whole_file = ReplaceAll (whole_file, std::string(temp1), std::string(temp2));
+    }
   }
 
+  //fin du programme
+  char temp[30];
+  sprintf(temp, "JCC %05x\n", index_ram ++);
+  whole_file += temp;
+
+  //gestion des variables
+  for (unsigned int i = 0; i < var_v.size(); ++i) {
+    //printf("%d VAR %x //nom: %s\n", index_ram, var_v[i].value, var_v[i].name.c_str());
+    char temp[30];
+    sprintf(temp, "VAR %07x\n", var_v[i].value);
+    whole_file += temp;
+    var_v[i].address = index_ram;
+    index_ram++;
+    
+    //replacement of the variable name in the program with the address
+    char temp1[30] = "";
+    char temp2[30] = "";
+    sprintf(temp1, ":addr(%s)", var_v[i].name.c_str());
+    sprintf(temp2, "%05x", var_v[i].address);
+    whole_file = ReplaceAll(whole_file, std::string(temp1), std::string(temp2));
+  }
+
+  printf("\n\nFinal program : \n%s\n", whole_file.c_str() );
+
+  printf("This program has a total of %d lines = %.2f%% of the maximum\n", 
+          index_ram,
+          ((float)index_ram*100.f)/ (float)MAX_RAM  );
   in_f.close();
   close(out_f);
 
   return 0;
 }
+
