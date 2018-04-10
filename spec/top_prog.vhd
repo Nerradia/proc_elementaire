@@ -5,9 +5,10 @@ use IEEE.numeric_std.all;
 
 entity top_prog is 
   generic (
-    data_size    : integer := 8;    -- Taille de chaque mot stocké
-    address_size : integer := 6;     -- Largeur de l'adresse
-    clk_div      : integer := 347        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
+    data_size    : integer;    -- Taille de chaque mot stocké
+    address_size : integer;     -- Largeur de l'adresse
+    clk_div      : integer;        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
+    ram_address_size : integer
   );
   port (
     clk       : in  std_logic;
@@ -22,9 +23,7 @@ entity top_prog is
     bus_en_mem      : out std_logic;
     bus_R_W         : out std_logic;
     bus_data_out    : out std_logic_vector (data_size-1 downto 0);
-    bus_address     : out std_logic_vector (address_size-1 downto 0);
-
-    led_debug  : out std_logic
+    bus_address     : out std_logic_vector (address_size-1 downto 0)
   );
 end entity top_prog;
 
@@ -47,14 +46,14 @@ architecture rtl of top_prog is
 
   component prog_fsm is
     generic (
-      address_size : integer := 6  -- Largeur du signal d'adresses
-    );
+      ram_address_size : integer := 6  -- Largeur du signal d'adresses
+      );
     port (
       reset    : in  std_logic;
       clk      : in  std_logic;
 
       prog_btn : in  std_logic;
-      cpt_out  : in  std_logic_vector (address_size-1 downto 0);
+      cpt_out  : in  std_logic_vector (ram_address_size -1 downto 0);
       
       prog_status_led : out std_logic;
       clear           : out std_logic;
@@ -64,18 +63,17 @@ architecture rtl of top_prog is
   end component prog_fsm;
 
   component prog_compteur is
-      generic (
-              address_size : integer := 6  -- Largeur du signal d'adresses
-          );
-      port (
-          reset       : in  std_logic;
-          clk         : in  std_logic;
+    generic (
+      ram_address_size : integer := 6  -- Largeur du signal d'adresses
+      );
+    port (
+        clk         : in  std_logic;
 
-          init_cpt    : in  std_logic;
-          cpt_count   : in  std_logic;
+        init_cpt    : in  std_logic;
+        cpt_count   : in  std_logic;
 
-          cpt_out     : out std_logic_vector (address_size -1 downto 0)
-          );
+        cpt_out     : out std_logic_vector (ram_address_size -1 downto 0)
+        );
     end component;
 
   component bus_interface is
@@ -104,7 +102,7 @@ architecture rtl of top_prog is
   end component;
 
 
-  signal cpt_out          : std_logic_vector (address_size-1 downto 0);
+  signal cpt_out          : std_logic_vector (ram_address_size-1 downto 0);
   signal uart_data        : std_logic_vector (data_size-1 downto 0);
   signal uart_data_avail  : std_logic;
   signal clear            : std_logic;
@@ -128,10 +126,9 @@ inst_uart_to_parallel : uart_to_parallel
 
 inst_prog_compteur : prog_compteur
   generic map (
-    address_size => address_size
+    ram_address_size => ram_address_size
     )
-  port map (
-    reset      => reset,    
+  port map (  
     clk        => clk,      
     init_cpt   => clear, 
     cpt_count  => uart_data_avail,   
@@ -140,7 +137,7 @@ inst_prog_compteur : prog_compteur
 
 inst_prog_fsm : prog_fsm
     generic map (
-      address_size => address_size
+      ram_address_size => ram_address_size
     )
     port map (
       reset    => reset, 
@@ -169,7 +166,7 @@ inst_bus_interface : bus_interface
       data_in      => open,      
       bus_data_in  => (others => '0'),  
 
-      address      => cpt_out,      
+      address      => (address_size-1 downto ram_address_size => '0') & cpt_out,      
       bus_address  => bus_address,
 
       bus_R_W      => bus_R_W,
@@ -178,7 +175,5 @@ inst_bus_interface : bus_interface
       bus_en_mem   => bus_en_mem,
       en_mem       => uart_data_avail
       );
-
-led_debug <= uart_data_avail;
 
 end architecture;
