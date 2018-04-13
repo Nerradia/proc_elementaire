@@ -9,6 +9,11 @@
 
 #include <string.h>
 
+typedef enum {
+  INTEGER,
+  REAL
+} varType;
+
 class var
 {
 public:
@@ -17,8 +22,8 @@ public:
 
 public: 
   std::string name;
-
-  uint32_t value;
+  varType type;
+  int32_t value;
   uint32_t address;
 };
 

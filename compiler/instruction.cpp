@@ -63,6 +63,20 @@ std::string soustraction::print_instruction() {
   return instructions;
 }
 
+multiplication::multiplication() {
+  nb_ins = 4;
+  type = MULTIPLICATION;
+}
+
+std::string multiplication::print_instruction() {
+  std::string instructions = "";
+  instructions += "NOR :addr(FFFFFFF)\n";
+  instructions += "ADD :addr(" + a1.name   + ")\n";
+  instructions += "MUL :addr(" + a2.name   + ")\n";
+  instructions += "STA :addr(" + var_.name + ")\n";
+  return instructions;
+}
+
 condition::condition () {
   nb_ins = 4;
   type = CONDITION;

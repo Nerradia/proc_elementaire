@@ -78,6 +78,7 @@ bool is_declared( std::string name, std::vector<var> var_v) {
   }
   return false;
 }
+
 std::string ReplaceAll( std::string str, 
                         const std::string& from, 
                         const std::string& to ) {
@@ -100,7 +101,13 @@ inline bool isInteger(const std::string & s)
 }
 
 std::string find_name(std::string str) {
-  unsigned first = str.find("r") + 1;
+  unsigned first = 0;
+  if(str.find("entier")  != std::string::npos) {
+    first = str.find("r") + 1;
+  } else if(str.find("reel")  != std::string::npos) {
+    first = str.find("l") + 1;
+  }
+
   unsigned last = str.find(";");
   std::string strNew = str.substr (first, last-first);
   return strNew;
@@ -135,6 +142,20 @@ std::string argument_soustraction_1 (std::string str) {
 
 std::string argument_soustraction_2 (std::string str) {
   unsigned first = str.find("-") + 1;
+  unsigned last = str.find(";");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_multiplication_1 (std::string str) {
+  unsigned first = str.find("=") + 1;
+  unsigned last = str.find("*");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_multiplication_2 (std::string str) {
+  unsigned first = str.find("*") + 1;
   unsigned last = str.find(";");
   std::string strNew = str.substr (first, last-first);
   return strNew;
@@ -264,6 +285,13 @@ int main(int argc, char const *argv[])
 
     if ( line.find("entier")    != std::string::npos ) {
       v.name = find_name(line);
+      v.type = INTEGER;
+      v.value = 0;
+      var_v.push_back(v);
+
+    } else if ( line.find("reel")    != std::string::npos ) {
+      v.name = find_name(line);
+      v.type = REAL;
       v.value = 0;
       var_v.push_back(v);
 
@@ -291,7 +319,8 @@ int main(int argc, char const *argv[])
       ins->set_argument2( v );
       ins_v.push_back(ins);
 
-    } else if ( line.find("-")  != std::string::npos ) {
+    } else if (    line.find("-")  != std::string::npos 
+                && line.find("=-") == std::string::npos) {
       ins = new soustraction;
       //first, find the variable to update
       v.name = variable_to_change(line);
@@ -313,11 +342,35 @@ int main(int argc, char const *argv[])
       ins->set_argument2( v );
       ins_v.push_back(ins);
     
+    } else if ( line.find("*")  != std::string::npos) {
+      //TODO
+      ins = new multiplication;
+      //first, find the variable to update
+      v.name = variable_to_change(line);
+      ins->set_return_var( v );
+      //then find the 2 arguments
+      v.name = argument_multiplication_1(line);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument1( v );
+      v.name = argument_multiplication_2(line);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument2( v );
+      ins_v.push_back(ins);
+    
     } else if ( line.find("fin_si") != std::string::npos ) {
       ins = new endif;      
       ins_v.push_back(ins);
 
-    } else if ( line.find("si") != std::string::npos ) {
+    } else if (    line.find("si")  != std::string::npos 
+                && line.find("sin") == std::string::npos) {
       condition *cond = new condition;
       cond->set_condition_type ( condition_type (line) );
       cond->num = cpt_cond++;
@@ -392,6 +445,7 @@ int main(int argc, char const *argv[])
         v.value = atol(v.name.c_str());
         var_v.push_back(v);
       }
+      printf("var : %s value :%x\n", v.name.c_str(), v.value );
       ins->set_argument1( v );
       ins_v.push_back(ins);
     } else {
@@ -440,7 +494,7 @@ int main(int argc, char const *argv[])
   for (unsigned int i = 0; i < var_v.size(); ++i) {
     //printf("%d VAR %x //nom: %s\n", index_ram, var_v[i].value, var_v[i].name.c_str());
     char temp[30];
-    sprintf(temp, "VAR %07x\n", var_v[i].value);
+    sprintf(temp, "VAR %07x\n", var_v[i].value & 0x1ffffff);
     whole_file += temp;
     var_v[i].address = index_ram;
     index_ram++;
