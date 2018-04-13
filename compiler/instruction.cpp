@@ -50,17 +50,15 @@ std::string affectation::print_instruction() {
 }
 
 soustraction::soustraction() {
-  nb_ins = 6;
+  nb_ins = 4;
   type = SOUSTRACTION;
 }
 
 std::string soustraction::print_instruction() {
   std::string instructions = "";
   instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a2.name   + ")\n";
-  instructions += "NOR :addr(0)\n";
-  instructions += "ADD :addr(1)\n";
   instructions += "ADD :addr(" + a1.name   + ")\n";
+  instructions += "SUB :addr(" + a2.name   + ")\n";
   instructions += "STA :addr(" + var_.name + ")\n";
   return instructions;
 }

@@ -41,21 +41,45 @@
 #include <sys/stat.h>
 #include <sys/file.h>
 
-//description of the language
-#define NOR 0
-#define ADD 1
-#define STA 2
-#define JCC 3
-#define JMP 4
-#define TGT 5
-#define TLT 6
-#define TEQ 7
-#define VAR 8
+
+// list of instructions available
+//locical operands
+#define LOR 1 // logical OR
+#define XOR 2
+#define AND 3
+#define NOR 4
+
+//mathematical operands
+#define ADD 5
+#define SUB 6
+#define DIV 7
+#define MUL 8
+#define MOD 9 //modulo
+
+//float operands
+#define FAD 10 // addition 
+#define FDI 11 //division
+#define FMU 12 //multiply
+
+//UTILS
+#define STA 13
+#define JCC 14
+#define JMP 15 //jump
+#define VAR 16 //declaration of a variable
+#define GET 17
+
+//TESTS
+#define TGT 18 //greater than
+#define TLT 19 //lower than
+#define TEQ 20 //equal
+
+//Casts
+#define FTI 21 //float to int 
+#define ITF 22 //int to float
 
 #define INSTR_HEX_LENGTH 3
 #define ADD_HEX_LENGTH 5
 #define VAR_HEX_LENGTH 7
-
 
 #define INSTR_BIN_LENGTH 5
 #define VALUE_BIN_LENGTH 20

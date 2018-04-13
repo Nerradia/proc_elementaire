@@ -36,17 +36,39 @@
 #include "instruction.h"
 #include "variable.h"
 
-#define MAX_RAM 0x8000
+#define MAX_RAM 8192
+
 /* list of instructions available
+  //locical operands
+  LOR // logical OR
+  XOR
+  AND
   NOR
+  //mathematical operands
   ADD
+  SUB
+  DIV
+  MUL
+  MOD //modulo
+  //float operands
+  FAD // addition 
+  FDI //division
+  FMU //multiply
+
+  //UTILS
   STA
   JCC
   JMP //jump
+  VAR //declaration of a variable
+
+  //TESTS
   TGT //greater than
   TLT //lower than
   TEQ //equal
-  VAR //equal
+
+  //Casts
+  FTI //float to int 
+  ITF //int to float
 */
 
 bool is_declared( std::string name, std::vector<var> var_v) {
