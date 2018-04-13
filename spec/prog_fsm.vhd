@@ -3,6 +3,9 @@ use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
 
+ -- Main Author : Julien BESSE
+ -- With the kind collaboration of : Pierre JOUBERT
+
 entity prog_fsm is
     generic (
       ram_address_size : integer := 6  -- Largeur du signal d'adresses de la partie à programmer

@@ -1,6 +1,9 @@
 library ieee;
 use ieee.std_logic_1164.ALL;
 use ieee.numeric_std.all;
+
+ -- Main Author : Julien BESSE
+ -- With the kind collaboration of : Pierre JOUBERT
  
 entity uart_to_parallel is
   generic (

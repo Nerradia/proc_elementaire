@@ -3,6 +3,9 @@ use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
 
+ -- Main Author : Julien BESSE
+ -- With the kind collaboration of : Pierre JOUBERT
+
 entity top_projet is
     generic (
       op_code_size      : integer :=  5;    -- Largeur du signal des instructions
@@ -39,7 +42,12 @@ entity top_projet is
 
       -- Afficheur 8 x 7 segments
       sevenseg             : out std_logic_vector (6 downto 0);
-      sevenseg_an          : out std_logic_vector (7 downto 0)
+      sevenseg_an          : out std_logic_vector (7 downto 0);
+
+      switches             : in  std_logic_vector(15 downto 0);
+
+      -- LEDs
+      led_out     : out std_logic_vector(15 downto 0)
      );
 end entity;
 
@@ -131,7 +139,13 @@ architecture rtl of top_projet is
 
     -- Afficheur 8 x 7 segments
     sevenseg    : out std_logic_vector (6 downto 0);
-    sevenseg_an : out std_logic_vector (7 downto 0)
+    sevenseg_an : out std_logic_vector (7 downto 0);
+
+    -- Interrupteurs
+    switches    : in  std_logic_vector (15 downto 0);
+
+    -- LEDs
+    led_out     : out std_logic_vector(15 downto 0)
     );
   end component;
 
@@ -354,7 +368,11 @@ inst_ram_cpu : ram_simple
 
     -- Afficheur 8 x 7 segments
     sevenseg           => sevenseg,
-    sevenseg_an        => sevenseg_an
+    sevenseg_an        => sevenseg_an,
+
+    switches           => switches,
+
+    led_out            => led_out
     );
 
 
