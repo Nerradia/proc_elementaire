@@ -7,29 +7,28 @@ use IEEE.numeric_std.all;
  -- With the kind collaboration of : Pierre JOUBERT
 
 entity UT is
-    generic (
-            op_code_size : integer := 2; -- Largeur du signal des instructions
-            sel_ual_size : integer := 1; -- Taille du sélectionneur d'opération de l'UAL
-            data_size    : integer := 8  -- Taille de chaque mot stocké
-        );
-    port (
-        reset    : in  std_logic;
-        clk      : in  std_logic;
-        clk_en   : in  std_logic;
+  generic (
+    op_code_size : integer; -- Largeur du signal des instructions
+    data_size    : integer  -- Taille de chaque mot stocké
+      );
+  port (
+  reset    : in  std_logic;
+    clk      : in  std_logic;
+    clk_en   : in  std_logic;
 
-        data_in  : in  std_logic_vector(data_size-1 downto 0);
-        data_out : out std_logic_vector(data_size-1 downto 0);
+    data_in  : in  std_logic_vector(data_size-1 downto 0);
+    data_out : out std_logic_vector(data_size-1 downto 0);
 
-        carry    : out std_logic;
+    carry    : out std_logic;
 
-        sel_ual  : in std_logic_vector(sel_ual_size-1 downto 0);
+    sel_ual  : in std_logic_vector(op_code_size-1 downto 0);
 
-        load_ra  : in std_logic;
-        load_ff  : in std_logic;
-        load_rd  : in std_logic;
-        init_ff  : in std_logic;
-        init_acc : in std_logic
-        );
+    load_ra  : in std_logic;
+    load_ff  : in std_logic;
+    load_rd  : in std_logic;
+    init_ff  : in std_logic;
+    init_acc : in std_logic
+  );
 
 end entity;
 
@@ -54,11 +53,12 @@ architecture rtl of UT is
 
     component UAL 
         generic (
-            data_size    : integer := 8;
-            sel_ual_size : integer := 1
+          data_size    : integer;
+          op_code_size : integer
         );
     port (
-        sel_ual   : in  std_logic_vector (sel_ual_size-1 downto 0);
+      --  clk       : in std_logic;
+        sel_ual   : in  std_logic_vector (op_code_size-1 downto 0);
         data_A    : in  std_logic_vector (data_size-1 downto 0);
         data_B    : in  std_logic_vector (data_size-1 downto 0);
 
@@ -79,9 +79,10 @@ begin
 inst_UAL : UAL
     generic map(
          data_size    => data_size,
-         sel_ual_size => sel_ual_size
+         op_code_size => op_code_size
     )
     port map(
+       --clk      => clk,
         sel_ual  => sel_ual,
         data_A   => reg_data_to_UAL,
         data_B   => reg_accu_to_UAL,

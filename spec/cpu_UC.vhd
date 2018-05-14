@@ -8,10 +8,9 @@ use IEEE.numeric_std.all;
 
 entity UC is
     generic (
-            op_code_size : integer := 2;  -- Largeur du signal des instructions
-            sel_ual_size : integer := 1; -- Taille du sélectionneur d'opération de l'UAL
-            data_size    : integer := 8;  -- Taille de chaque mot stocké
-            address_size : integer := 6
+            op_code_size : integer;  -- Largeur du signal des instructions
+            data_size    : integer;  -- Taille de chaque mot stocké
+            address_size : integer
         );
     port (
         reset    : in  std_logic;
@@ -32,7 +31,7 @@ entity UC is
         load_ra  : out std_logic;
 
         -- UAL
-        sel_ual  : out std_logic_vector (sel_ual_size-1 downto 0);
+        sel_ual  : out std_logic_vector (op_code_size-1 downto 0);
         carry    : in  std_logic;
 
         -- RAM
@@ -76,8 +75,7 @@ architecture rtl of UC is
 
     component fsm
         generic (
-            op_code_size : integer := 2;  -- Largeur du signal des instructions
-            sel_ual_size : integer := 1   -- Largeur du nombre d'instructions de l'UAL
+            op_code_size : integer  -- Largeur du signal des instructions
         );
     port (
         reset    : in  std_logic;
@@ -103,7 +101,7 @@ architecture rtl of UC is
         load_ra  : out std_logic;
 
         -- UAL
-        sel_ual  : out std_logic_vector (sel_ual_size-1 downto 0);
+        sel_ual  : out std_logic_vector (op_code_size-1 downto 0);
         carry    : in  std_logic;
 
         -- RAM
@@ -145,8 +143,7 @@ begin
 
 inst_fsm : fsm 
     generic map(
-        op_code_size => op_code_size,
-        sel_ual_size => sel_ual_size
+        op_code_size => op_code_size
         )
     port map(
         reset    => reset,
