@@ -15,6 +15,7 @@
 typedef enum {
   ADDITION,
   SOUSTRACTION,
+  MULTIPLICATION,
   AFFECTATION,
   CONDITION,
   FIN_CONDITION,
@@ -70,6 +71,13 @@ class soustraction : public instruction {
 public:
   soustraction();
   ~soustraction();
+  std::string print_instruction();
+};
+
+class multiplication : public instruction {
+public:
+  multiplication();
+  ~multiplication();
   std::string print_instruction();
 };
 
