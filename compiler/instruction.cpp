@@ -89,13 +89,13 @@ void condition::set_condition_type (std::string type) {
 std::string condition::print_instruction () {
   std::string instructions = "";
   instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name   + ")\n";
+  instructions += "ADD :addr(" + a1.name + ")\n";
   if( condition_type == "<") {
-    instructions += "TLT :addr(" + a2.name   + ")\n";
+    instructions += "TLT :addr(" + a2.name + ")\n";
   } else if( condition_type == ">") {
-    instructions += "TGT :addr(" + a2.name   + ")\n";
+    instructions += "TGT :addr(" + a2.name + ")\n";
   } else if( condition_type ==  "==") {
-    instructions += "TEQ :addr(" + a2.name   + ")\n";
+    instructions += "TEQ :addr(" + a2.name + ")\n";
   }
   instructions += "JCC :condition(" + std::to_string(num) + ")\n";
   return instructions;
@@ -123,13 +123,13 @@ void loop::set_condition_type (std::string type) {
 std::string loop::print_instruction() {
   std::string instructions = "";
   instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name   + ")\n";
+  instructions += "ADD :addr(" + a1.name + ")\n";
   if( condition_type == "<") {
-    instructions += "TGT :addr(" + a2.name   + ")\n";
+    instructions += "TGT :addr(" + a2.name + ")\n";
   } else if( condition_type == ">") {
-    instructions += "TLT :addr(" + a2.name   + ")\n";
+    instructions += "TLT :addr(" + a2.name + ")\n";
   } else if( condition_type ==  "!=") {
-    instructions += "TEQ :addr(" + a2.name   + ")\n";
+    instructions += "TEQ :addr(" + a2.name + ")\n";
   }
   instructions += "JCC :endloop(" + std::to_string(num) + ")\n";
   return instructions;
@@ -150,15 +150,45 @@ std::string endloop::print_instruction() {
   return instructions;
 }
 
+disp_LCD::disp_LCD() {
+  nb_ins = 3;
+  type = AFFICHAGE_LCD;
+}
+
+std::string disp_LCD::print_instruction() {
+  std::string instructions = "";
+  instructions += "NOR :addr(FFFFFFF)\n";
+  instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "STA 80001\n";
+  return instructions;
+}
+
 disp_screen::disp_screen() {
   nb_ins = 3;
+  type = AFFICHAGE_ECRAN;
 }
 
 std::string disp_screen::print_instruction() {
   std::string instructions = "";
   instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name   + ")\n";
-  instructions += "STA 80001\n";
+  instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "ADD :addr(SCREENINDEX)\n";
+  instructions += "SAD :addr(" + a2.name + ")\n";
+  return instructions;
+}
+
+sine::sine() {
+  nb_ins = 3;
+  type = SIN;
+}
+
+std::string sine::print_instruction() {
+  std::string instructions = "";
+  instructions += "NOR :addr(FFFFFFF)\n";
+  instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "ADD :addr(SININDEX)\n";
+  instructions += "STA :addr(DUMMY)\n";
+  instructions += "GAD :addr(DUMMY)\n"; //get @ address
   return instructions;
 }
 

@@ -20,7 +20,11 @@ typedef enum {
   CONDITION,
   FIN_CONDITION,
   TANT_QUE,
-  FIN_TANT_QUE
+  FIN_TANT_QUE,
+  AFFICHAGE_LCD,
+  AFFICHAGE_ECRAN,
+  SIN,
+  COS
 } INS_TYPE;
 
 
@@ -117,10 +121,24 @@ public:
   std::string print_instruction();
 };
 
+class disp_LCD : public instruction {
+public:
+  disp_LCD();
+  ~disp_LCD();
+  std::string print_instruction();
+};
+
 class disp_screen : public instruction {
 public:
   disp_screen();
   ~disp_screen();
+  std::string print_instruction();
+};
+
+class sine : public instruction {
+public:
+  sine();
+  ~sine();
   std::string print_instruction();
 };
 

@@ -260,8 +260,8 @@ int main(int argc, char const *argv[])
 
   std::vector<var>            var_v;
   std::vector<instruction*>   ins_v;
-  unsigned int cpt_cond = 0;
-  unsigned int cpt_loop = 0;
+  int cpt_cond = 0;
+  int cpt_loop = 0;
 
   /*implementation of standard constants*/
     var v;
@@ -276,6 +276,15 @@ int main(int argc, char const *argv[])
     // FF
     v.name = "FFFFFFF";
     v.value = 0xFFFFFFF;
+    var_v.push_back(v);
+    // sine index
+    v.name = "SININDEX";
+    v.value = 0x0003000;
+    var_v.push_back(v);
+    
+    // sine index
+    v.name = "SCREENINDEX";
+    v.value = 0x0002000;
     var_v.push_back(v);
 
   //parser
@@ -421,16 +430,35 @@ int main(int argc, char const *argv[])
 
       ins_v.push_back(lo);
 
-    } else if ( line.find("afficher")  != std::string::npos ) {
-      ins = new disp_screen;
+    } else if ( line.find("afficher_LCD")  != std::string::npos ) {
+      ins = new disp_LCD;
       //first, find the variable to update
-      v.name = find_name(line);
+      v.name = argument_condition1(line,")");
       //we check if it's an undeclared constant
       if(isInteger(v.name) && ! is_declared(v.name, var_v)){
         v.value = atol(v.name.c_str());
         var_v.push_back(v);
       }
       ins->set_argument1( v );
+      ins_v.push_back(ins);
+
+    } else if ( line.find("ecrire_mem")  != std::string::npos ) {
+      ins = new disp_screen;
+      //first, find the variable to update
+      v.name = argument_condition1(line,",");
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument1( v );
+      v.name = argument_condition2(line,",");
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument2( v );
       ins_v.push_back(ins);
 
     } else if ( line.find("=")  != std::string::npos ) {
@@ -508,6 +536,16 @@ int main(int argc, char const *argv[])
   }
 
   printf("\n\nFinal program : \n%s\n", whole_file.c_str() );
+
+  if ( cpt_loop < 0)
+    std::cerr << "\033[1;31mError: " << cpt_loop * -1 << " more loop closed than open\033[0m" << std::endl;
+  if ( cpt_loop > 0)
+    std::cerr << "\033[1;31mError: " << cpt_loop << " loop(s) has not been closed\033[0m" << std::endl;
+
+  if ( cpt_cond < 0)
+    std::cerr << "\033[1;31mError: " << cpt_cond * -1 << " more condition(s) closed than open\033[0m" << std::endl;
+  if ( cpt_cond > 0)
+    std::cerr << "\033[1;31mError: " << cpt_cond << " condition(s) has not been closed\033[0m" << std::endl;
 
   printf("This program has a total of %d lines = %.2f%% of the maximum\n", 
           index_ram,
