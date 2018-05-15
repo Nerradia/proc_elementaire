@@ -64,11 +64,11 @@ architecture rtl of FSM is
   constant OP_SUB  : std_logic_vector (op_code_size-1 downto 0) := "00101";
   constant OP_DIV  : std_logic_vector (op_code_size-1 downto 0) := "00110";
   constant OP_MUL  : std_logic_vector (op_code_size-1 downto 0) := "00111";
-  constant OP_MOD  : std_logic_vector (op_code_size-1 downto 0) := "01000";
+  --constant OP_MOD  : std_logic_vector (op_code_size-1 downto 0) := "01000";
 
   -- Instructions mathématiques sur flottants
   constant OP_ADDF : std_logic_vector (op_code_size-1 downto 0) := "01001";
-  constant OP_DIVF : std_logic_vector (op_code_size-1 downto 0) := "01010";
+  --constant OP_DIVF : std_logic_vector (op_code_size-1 downto 0) := "01010";
   constant OP_MULF : std_logic_vector (op_code_size-1 downto 0) := "01011";
 
   -- Conversions flottants/entiers
@@ -86,10 +86,6 @@ architecture rtl of FSM is
   constant OP_TLT  : std_logic_vector (op_code_size-1 downto 0) := "10101";
   constant OP_TEQ  : std_logic_vector (op_code_size-1 downto 0) := "10110";
 
-  -- Tests sur les flottants
-  constant OP_TGTF : std_logic_vector (op_code_size-1 downto 0) := "10111";
-  constant OP_TLTF : std_logic_vector (op_code_size-1 downto 0) := "11000";
-  constant OP_TEQF : std_logic_vector (op_code_size-1 downto 0) := "11001";
 
   type STATES is (INIT, FETCH_INST, DECODE, FETCH_OP, EXE_UAL, STA, EXE_JCC); 
   signal state : STATES;
@@ -224,9 +220,12 @@ architecture rtl of FSM is
           sel_mux  <= '1';
           sel_ual  <= op_code;
           load_ra  <= '1';
-          if op_code = OP_ADD
-          or op_code = OP_SUB
-          or op_code = OP_MUL 
+          if op_code = "00100"
+          or op_code = "00101"
+          or op_code = "00111"
+          or op_code = "10100"
+          or op_code = "10101"
+          or op_code = "10110"
           then
             load_ff  <= '1'; -- On enregistre l'éventuelle retenue
 

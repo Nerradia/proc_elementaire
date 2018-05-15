@@ -84,6 +84,8 @@ begin
 
   begin
     data_out_with_carry <= (others => '0');
+    data_A_fixed        := (others => '0'); 
+    data_B_fixed        := (others => '0'); 
 
     case sel_ual is
 
@@ -146,12 +148,13 @@ begin
   -- Conversions virgules fixes/entiers
   -- OP_FTOI
       when "01100" =>
-        -- Tronquage de la partie entière
-        --data_out_with_carry <= data_B(data_size-1 downto -sfixed_lsb); 
+        -- Tronquage de la partie entière (l'idéal serait un arrondi mais bon...)
+        data_out_with_carry(sfixed_msb downto 0) <= std_logic_vector(data_A_fixed(sfixed_msb downto 0)); 
 
   -- OP_ITOF
       when "01101" =>
-
+        -- On prend les bits les plus faibles de l'entier, qui deviennent la partie entière du virgule fixe
+       data_out_with_carry(sfixed_msb-sfixed_lsb downto -sfixed_lsb) <= data_A(sfixed_msb downto 0);
 
   -- Opérations mémoire
   -- OP_STA
@@ -163,30 +166,19 @@ begin
   -- OP_JMP
       when "10010" =>
 
-  -- OP_GET
-      when "10011" =>
 
-
-  -- Tests sur les entiers
+  -- Tests sur les entiers et les virgules fixes
   -- OP_TGT
       when "10100" =>
+        data_out_with_carry(data_size) <= '1' when unsigned(data_A) < unsigned (data_B) else '0';
 
   -- OP_TLT
       when "10101" =>
+        data_out_with_carry(data_size) <= '1' when unsigned(data_A) > unsigned (data_B) else '0';
 
   -- OP_TEQ
       when "10110" =>
-
-
-  -- Tests sur les virgules fixes
-  -- OP_TGTF
-      when "10111" =>
-
-  -- OP_TLTF
-      when "11000" =>
-
-  -- OP_TEQF
-      when "11001" =>
+        data_out_with_carry(data_size) <= '1' when unsigned(data_A) = unsigned (data_B) else '0';
 
 
       when others =>
