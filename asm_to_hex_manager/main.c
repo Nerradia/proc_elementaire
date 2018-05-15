@@ -44,38 +44,40 @@
 
 // list of instructions available
 //locical operands
-#define LOR 1 // logical OR
-#define XOR 2
-#define AND 3
-#define NOR 4
+#define NOR 0x0
+#define LOR 0x1 // logical OR
+#define AND 0x2
+#define XOR 0x3
 
 //mathematical operands
-#define ADD 5
-#define SUB 6
-#define DIV 7
-#define MUL 8
-#define MOD 9 //modulo
+#define ADD 0x4
+#define SUB 0x5
+#define DIV 0x6
+#define MUL 0x7
+#define MOD 0x8 //modulo
 
 //float operands
-#define FAD 10 // addition 
-#define FDI 11 //division
-#define FMU 12 //multiply
-
-//UTILS
-#define STA 13
-#define JCC 14
-#define JMP 15 //jump
-#define VAR 16 //declaration of a variable
-#define GET 17
-
-//TESTS
-#define TGT 18 //greater than
-#define TLT 19 //lower than
-#define TEQ 20 //equal
+#define FAD 0x9 // addition 
+#define FDI 0xA //division
+#define FMU 0xB //multiply
 
 //Casts
-#define FTI 21 //float to int 
-#define ITF 22 //int to float
+#define FTI 0xC //float to int 
+#define ITF 0xD //int to float
+
+//UTILS
+#define STA 0x10
+#define JCC 0x11
+#define JMP 0x12 //jump
+#define GET 0x13
+
+//TESTS
+#define TGT 0x14 //greater than
+#define TLT 0x15 //lower than
+#define TEQ 0x16 //equal
+
+//intern shit
+#define VAR 0x69
 
 #define INSTR_HEX_LENGTH 3
 #define ADD_HEX_LENGTH 5
@@ -202,10 +204,10 @@ int main(int argc, char const *argv[])
             output = val;
           }
 
-          printf( "instruction %d:\t %06x\t(hex)\n", 
+          printf( "instruction %d:\t %07x\t(hex)\n", 
                   counter, 
                   output );
-          sprintf( outputHex, "%06u\n", output);
+          sprintf( outputHex, "%07u\n", output);
           write( out_f, outputHex, strlen(outputHex));
           counter ++;
           state = INSTRUCT;
