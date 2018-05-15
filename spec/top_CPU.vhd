@@ -9,7 +9,6 @@ use IEEE.numeric_std.all;
 entity top_CPU is
     generic (
         op_code_size : integer := 2;    -- Largeur du signal des instructions
-        sel_ual_size : integer := 1;    -- Taille du sélectionneur d'opération de l'UAL
         data_size    : integer := 8;    -- Taille de chaque mot stocké
         address_size : integer := 6     -- Largeur de l'adresse
         );                              -- Attention, op_code + address_size doivent valoir data_size !
@@ -36,9 +35,8 @@ architecture rtl of top_CPU is
 
     component UT is
     generic (
-        op_code_size : integer := 2; -- Largeur du signal des instructions
-        sel_ual_size : integer := 1; -- Taille du sélectionneur d'opération de l'UAL
-        data_size    : integer := 8  -- Taille de chaque mot stocké
+        op_code_size : integer; -- Largeur du signal des instructions
+        data_size    : integer  -- Taille de chaque mot stocké
         );
     port (
         reset    : in  std_logic;
@@ -50,7 +48,7 @@ architecture rtl of top_CPU is
 
         carry    : out std_logic;
 
-        sel_ual  : in std_logic_vector(sel_ual_size-1 downto 0);
+        sel_ual  : in std_logic_vector(op_code_size-1 downto 0);
 
         load_ra  : in std_logic;
         load_ff  : in std_logic;
@@ -63,10 +61,9 @@ architecture rtl of top_CPU is
 
     component UC is
     generic (
-        op_code_size : integer := 2;  -- Largeur du signal des instructions
-        sel_ual_size : integer := 1; -- Taille du sélectionneur d'opération de l'UAL
-        data_size    : integer := 8;  -- Taille de chaque mot stocké
-        address_size : integer := 6
+        op_code_size : integer;  -- Largeur du signal des instructions
+        data_size    : integer;  -- Taille de chaque mot stocké
+        address_size : integer
       );
     port (
       reset    : in  std_logic;
@@ -87,7 +84,7 @@ architecture rtl of top_CPU is
       load_ra  : out std_logic;
 
       -- UAL
-      sel_ual  : out std_logic_vector (sel_ual_size-1 downto 0);
+      sel_ual  : out std_logic_vector (op_code_size-1 downto 0);
       carry    : in  std_logic;
 
       -- RAM
@@ -135,7 +132,7 @@ architecture rtl of top_CPU is
   signal load_ra      : std_logic;
 
   -- UAL
-  signal sel_ual      : std_logic_vector (sel_ual_size-1 downto 0);
+  signal sel_ual      : std_logic_vector (op_code_size-1 downto 0);
   signal carry        : std_logic;
 
   signal en_mem       : std_logic;
@@ -150,7 +147,6 @@ begin
 inst_ut : UT
   generic map(
     op_code_size => op_code_size,
-    sel_ual_size => sel_ual_size,
     data_size    => data_size
     )
   port map(
@@ -175,7 +171,6 @@ inst_ut : UT
 inst_uc :  UC
   generic map(
     op_code_size => op_code_size,
-    sel_ual_size => sel_ual_size,
     data_size    => data_size,
     address_size => address_size
     )

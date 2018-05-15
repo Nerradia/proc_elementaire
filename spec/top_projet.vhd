@@ -9,10 +9,9 @@ use IEEE.numeric_std.all;
 entity top_projet is
     generic (
       op_code_size      : integer :=  5;    -- Largeur du signal des instructions
-      sel_ual_size      : integer :=  4;    -- Taille du sélectionneur d'opération de l'UAL
       data_size         : integer := 25;    -- Taille de chaque mot stocké
       address_size      : integer := 20;    -- Largeur de l'adresse
-      clk_div           : integer := 868;   -- diviseur de l'horloge du fpga pour le port série de la programmation, défaut à 115200 Bauds avec clk à 25 MHz
+      clk_div           : integer := 868;  --437; -- diviseur de l'horloge du fpga pour le port série de la programmation, défaut à 115200 Bauds avec clk à 25 MHz
       ram_address_size  : integer := 13
     );                                -- Attention, op_code + address_size doivent valoir data_size !
     port (
@@ -57,7 +56,6 @@ architecture rtl of top_projet is
   component top_CPU is
     generic (
       op_code_size : integer := 2;    -- Largeur du signal des instructions
-      sel_ual_size : integer := 1;    -- Taille du sélectionneur d'opération de l'UAL
       data_size    : integer := 8;    -- Taille de chaque mot stocké
       address_size : integer := 6     -- Largeur de l'adresse
       );                              -- Attention, op_code + address_size doivent valoir data_size !
@@ -269,7 +267,6 @@ begin
 inst_CPU : top_CPU
     generic map(
       op_code_size => op_code_size,
-      sel_ual_size => sel_ual_size,
       data_size    => data_size,   
       address_size => address_size
     )
@@ -385,7 +382,6 @@ inst_ram_cpu : ram_simple
 inst_GPU : top_CPU
     generic map(
       op_code_size => op_code_size,
-      sel_ual_size => sel_ual_size,
       data_size    => data_size,   
       address_size => address_size
     )
