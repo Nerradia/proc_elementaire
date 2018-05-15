@@ -151,7 +151,7 @@ int main(int argc, char const *argv[])
 
   int n = 1;
   int counter = 0;
-  char file_readed[10000] = "";
+  char file_read[10000] = "";
 
   while (n > 0) {
     switch(state) {
@@ -160,13 +160,13 @@ int main(int argc, char const *argv[])
         ins = -1;
         n = read (in_f, instruction, INSTR_HEX_LENGTH);
         ins = decode_instruction(instruction);
-        sprintf(file_readed, "%s%s", file_readed, instruction);
+        sprintf(file_read, "%s%s", file_read, instruction);
 
         state = SPACE;
         break;
       case SPACE:
         n = read (in_f, &temp, 1);
-        sprintf(file_readed, "%s%c", file_readed, temp);
+        sprintf(file_read, "%s%c", file_read, temp);
 
         state = VALUE;
         break;
@@ -174,12 +174,12 @@ int main(int argc, char const *argv[])
         strcpy( value, "");
         if(ins != VAR) {
           n = read (in_f, value, ADD_HEX_LENGTH);
-          sprintf(file_readed, "%s%s", file_readed, value);
+          sprintf(file_read, "%s%s", file_read, value);
 
           //value[n] = 0;
         } else {
           n = read (in_f, value, VAR_HEX_LENGTH);
-          sprintf(file_readed, "%s%s", file_readed, value);
+          sprintf(file_read, "%s%s", file_read, value);
 
           //value[n] = 0;
         }
@@ -189,7 +189,7 @@ int main(int argc, char const *argv[])
       case EOL:
         n = read (in_f, &temp, 1);
         if( temp == '\n') {
-          sprintf ( file_readed, "%s\n", file_readed );
+          sprintf ( file_read, "%s\n", file_read );
 
           val = (int)strtol(value, NULL, 16);;
 
@@ -215,7 +215,7 @@ int main(int argc, char const *argv[])
       break;
     }
   }
-  //printf("Fichier lu: \n%s\n", file_readed);
+  //printf("Fichier lu: \n%s\n", file_read);
 
   printf("End of program\n");
 
