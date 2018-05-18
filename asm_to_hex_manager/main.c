@@ -111,8 +111,8 @@ int main(int argc, char const *argv[])
   //opening of the files
   if(argc <= 1) {
     printf("You should use this program with the following arguments :\n");
-    printf("\t ./dtm input_file target_serial_port \n");
-    printf("\t example : ./asm input_file.asm outputfile.bytes \n");
+    printf("\t %s input_file target_serial_port \n", argv[0]);
+    printf("\t example : %s input_file.asm outputfile.bytes \n", argv[0]);
     return -1;
   } 
 
@@ -196,7 +196,7 @@ int main(int argc, char const *argv[])
           val = (int)strtol(value, NULL, 16);;
 
           //overflow security
-          val = val & ((int)pow(2,VALUE_BIN_LENGTH) - 1);
+          val = val & ((int)pow(2,VALUE_BIN_LENGTH + INSTR_BIN_LENGTH) - 1);
 
           if(ins != VAR) {
             output = ins << VALUE_BIN_LENGTH | val;
@@ -207,7 +207,7 @@ int main(int argc, char const *argv[])
           printf( "instruction %d:\t %07x\t(hex)\n", 
                   counter, 
                   output );
-          sprintf( outputHex, "%07u\n", output);
+          sprintf( outputHex, "%07x\n", output);
           write( out_f, outputHex, strlen(outputHex));
           counter ++;
           state = INSTRUCT;

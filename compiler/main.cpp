@@ -273,6 +273,10 @@ int main(int argc, char const *argv[])
     v.name = "1";
     v.value = 1;
     var_v.push_back(v);
+    // 1
+    v.name = "180";
+    v.value = 0xB4;
+    var_v.push_back(v);
     // FF
     v.name = "FFFFFFF";
     v.value = 0xFFFFFFF;
@@ -285,6 +289,11 @@ int main(int argc, char const *argv[])
     // sine index
     v.name = "SCREENINDEX";
     v.value = 0x0002000;
+    var_v.push_back(v);
+    
+    // dummy index
+    v.name = "DUMMY";
+    v.value = 0x0000000;
     var_v.push_back(v);
 
   //parser
@@ -398,6 +407,32 @@ int main(int argc, char const *argv[])
         var_v.push_back(v);
       }
       cond->set_argument2( v );
+
+      ins_v.push_back(cond);
+
+    } else if ( line.find("sin(")  != std::string::npos ) {
+      sine *cond = new sine;
+
+      v.name = argument_condition1(line,")");
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      cond->set_argument1 ( v );
+
+      ins_v.push_back(cond);
+
+    } else if ( line.find("cos(")  != std::string::npos ) {
+      cos *cond = new cos;
+
+      v.name = argument_condition1(line,")");
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      cond->set_argument1 ( v );
 
       ins_v.push_back(cond);
 
@@ -535,7 +570,9 @@ int main(int argc, char const *argv[])
     whole_file = ReplaceAll(whole_file, std::string(temp1), std::string(temp2));
   }
 
-  printf("\n\nFinal program : \n%s\n", whole_file.c_str() );
+  //printf("\n\nFinal program : \n%s\n", whole_file.c_str() );
+  whole_file = whole_file + "\n\n";
+  write( out_f, whole_file.c_str(), strlen(whole_file.c_str()));
 
   if ( cpt_loop < 0)
     std::cerr << "\033[1;31mError: " << cpt_loop * -1 << " more loop closed than open\033[0m" << std::endl;

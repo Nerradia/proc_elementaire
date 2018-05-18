@@ -142,5 +142,12 @@ public:
   std::string print_instruction();
 };
 
+class cos : public instruction {
+public:
+  cos();
+  ~cos();
+  std::string print_instruction();
+};
+
 #endif
 

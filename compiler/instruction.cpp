@@ -164,7 +164,7 @@ std::string disp_LCD::print_instruction() {
 }
 
 disp_screen::disp_screen() {
-  nb_ins = 3;
+  nb_ins = 4;
   type = AFFICHAGE_ECRAN;
 }
 
@@ -178,7 +178,7 @@ std::string disp_screen::print_instruction() {
 }
 
 sine::sine() {
-  nb_ins = 3;
+  nb_ins = 5;
   type = SIN;
 }
 
@@ -186,6 +186,22 @@ std::string sine::print_instruction() {
   std::string instructions = "";
   instructions += "NOR :addr(FFFFFFF)\n";
   instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "ADD :addr(SININDEX)\n";
+  instructions += "STA :addr(DUMMY)\n";
+  instructions += "GAD :addr(DUMMY)\n"; //get @ address
+  return instructions;
+}
+
+cos::cos() {
+  nb_ins = 6;
+  type = COS;
+}
+
+std::string cos::print_instruction() {
+  std::string instructions = "";
+  instructions += "NOR :addr(FFFFFFF)\n";
+  instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "ADD :addr(180)\n";
   instructions += "ADD :addr(SININDEX)\n";
   instructions += "STA :addr(DUMMY)\n";
   instructions += "GAD :addr(DUMMY)\n"; //get @ address

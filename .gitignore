@@ -6,3 +6,9 @@ data_transfer_manager/a\.out
 *.gch
 
 compiler/how_to_do_instructions\.txt
+
+asm_to_hex_manager/asm_to_hex_manager
+
+compiler/compiler
+
+data_transfer_manager/data_transfer_manager
