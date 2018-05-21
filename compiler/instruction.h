@@ -22,9 +22,10 @@ typedef enum {
   TANT_QUE,
   FIN_TANT_QUE,
   AFFICHAGE_LCD,
-  AFFICHAGE_ECRAN,
+  ECRITURE_MEMOIRE,
   SIN,
-  COS
+  COS,
+  WRITE_AT
 } INS_TYPE;
 
 
@@ -45,6 +46,7 @@ public:
 protected:
   var a1;
   var a2;
+  var a3;
   var var_;
 
 public :
@@ -128,10 +130,10 @@ public:
   std::string print_instruction();
 };
 
-class disp_screen : public instruction {
+class write_to_shared : public instruction {
 public:
-  disp_screen();
-  ~disp_screen();
+  write_to_shared();
+  ~write_to_shared();
   std::string print_instruction();
 };
 
@@ -146,6 +148,13 @@ class cos : public instruction {
 public:
   cos();
   ~cos();
+  std::string print_instruction();
+};
+
+class write_at : public instruction {
+public:
+  write_at();
+  ~write_at();
   std::string print_instruction();
 };
 

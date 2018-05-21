@@ -76,6 +76,10 @@
 #define TLT 0x15 //lower than
 #define TEQ 0x16 //equal
 
+//MEMORY MOVEMENTS
+#define GAD 0x18
+#define SAD 0x19
+
 //intern shit
 #define VAR 0x69
 
@@ -95,15 +99,34 @@ enum FSM {
 
 int decode_instruction(char * instruction) {
   if( ! strcmp(instruction, "NOR") ) return NOR;
+  if( ! strcmp(instruction, "LOR") ) return LOR;
+  if( ! strcmp(instruction, "AND") ) return AND;
+  if( ! strcmp(instruction, "XOR") ) return XOR;
   if( ! strcmp(instruction, "ADD") ) return ADD;
+  if( ! strcmp(instruction, "SUB") ) return SUB;
+  if( ! strcmp(instruction, "DIV") ) return DIV;
+  if( ! strcmp(instruction, "MUL") ) return MUL;
+  if( ! strcmp(instruction, "MOD") ) return MOD;
+  if( ! strcmp(instruction, "FAD") ) return FAD;
+  if( ! strcmp(instruction, "FDI") ) return FDI;
+  if( ! strcmp(instruction, "FMU") ) return FMU;
+  if( ! strcmp(instruction, "FTI") ) return FTI;
+  if( ! strcmp(instruction, "ITF") ) return ITF;
   if( ! strcmp(instruction, "STA") ) return STA;
   if( ! strcmp(instruction, "JCC") ) return JCC;
-  if( ! strcmp(instruction, "JMP") ) return JMP; //jump
-  if( ! strcmp(instruction, "TGT") ) return TGT; //greater than
-  if( ! strcmp(instruction, "TLT") ) return TLT; //lower than
-  if( ! strcmp(instruction, "TEQ") ) return TEQ; //equal
-  if( ! strcmp(instruction, "VAR") ) return VAR; //equal
-  return -1;
+  if( ! strcmp(instruction, "JMP") ) return JMP;
+  if( ! strcmp(instruction, "GET") ) return GET;
+  if( ! strcmp(instruction, "TGT") ) return TGT;
+  if( ! strcmp(instruction, "TLT") ) return TLT;
+  if( ! strcmp(instruction, "TEQ") ) return TEQ;
+  if( ! strcmp(instruction, "GAD") ) return GAD;
+  if( ! strcmp(instruction, "SAD") ) return SAD;
+  if( ! strcmp(instruction, "VAR") ) return VAR;
+  if( strlen( instruction ) >= 1 ) {
+    fprintf(stderr, "%s : Instruction inconnue\n", instruction);
+    exit(1);
+  }
+  return 0;
 }
 
 int main(int argc, char const *argv[])

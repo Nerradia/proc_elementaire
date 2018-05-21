@@ -287,7 +287,7 @@ int main(int argc, char const *argv[])
     var_v.push_back(v);
     
     // sine index
-    v.name = "SCREENINDEX";
+    v.name = "SHARED_INDEX";
     v.value = 0x0002000;
     var_v.push_back(v);
     
@@ -477,8 +477,27 @@ int main(int argc, char const *argv[])
       ins->set_argument1( v );
       ins_v.push_back(ins);
 
-    } else if ( line.find("ecrire_mem")  != std::string::npos ) {
-      ins = new disp_screen;
+    } else if ( line.find("ecrire_mem_part")  != std::string::npos ) {
+      ins = new write_to_shared;
+      //first, find the variable to update
+      v.name = argument_condition1(line,",");
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument1( v );
+      v.name = argument_condition2(line,",");
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument2( v );
+      ins_v.push_back(ins);
+
+    } else if ( line.find("ecrire_a")  != std::string::npos ) {
+      ins = new write_at;
       //first, find the variable to update
       v.name = argument_condition1(line,",");
       //we check if it's an undeclared constant
@@ -550,7 +569,7 @@ int main(int argc, char const *argv[])
 
   //fin du programme
   char temp[30];
-  sprintf(temp, "JCC %05x\n", index_ram ++);
+  sprintf(temp, "JMP %05x\n", index_ram ++);
   whole_file += temp;
 
   //gestion des variables
@@ -571,7 +590,7 @@ int main(int argc, char const *argv[])
   }
 
   //printf("\n\nFinal program : \n%s\n", whole_file.c_str() );
-  whole_file = whole_file + "\n\n";
+  //whole_file = whole_file + "\n\n";
   write( out_f, whole_file.c_str(), strlen(whole_file.c_str()));
 
   if ( cpt_loop < 0)

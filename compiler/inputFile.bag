@@ -1,9 +1,15 @@
+entier adresse;
 entier a;
-a = 0;
-afficher 1;
-tant_que (1 < 2)
-a = a + 1;
-afficher a;
-fin_tant_que
-afficher a;
 
+entier temp;
+
+a = 0;
+tant_que(1<2)
+  adresse = 524288;
+  tant_que(adresse < 831487)
+    temp = adresse + a;
+    ecrire_a (temp, adresse);
+    adresse = adresse + 1;
+  fin_tant_que;
+  a = a + 2;
+fin_tant_que;  

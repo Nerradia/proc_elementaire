@@ -124,11 +124,11 @@ std::string loop::print_instruction() {
   std::string instructions = "";
   instructions += "NOR :addr(FFFFFFF)\n";
   instructions += "ADD :addr(" + a1.name + ")\n";
-  if( condition_type == "<") {
+  if( condition_type == ">") {
     instructions += "TGT :addr(" + a2.name + ")\n";
-  } else if( condition_type == ">") {
+  } else if( condition_type == "<") {
     instructions += "TLT :addr(" + a2.name + ")\n";
-  } else if( condition_type ==  "!=") {
+  } else if( condition_type ==  "==") {
     instructions += "TEQ :addr(" + a2.name + ")\n";
   }
   instructions += "JCC :endloop(" + std::to_string(num) + ")\n";
@@ -163,16 +163,16 @@ std::string disp_LCD::print_instruction() {
   return instructions;
 }
 
-disp_screen::disp_screen() {
+write_to_shared::write_to_shared() {
   nb_ins = 4;
-  type = AFFICHAGE_ECRAN;
+  type = ECRITURE_MEMOIRE;
 }
 
-std::string disp_screen::print_instruction() {
+std::string write_to_shared::print_instruction() {
   std::string instructions = "";
   instructions += "NOR :addr(FFFFFFF)\n";
   instructions += "ADD :addr(" + a1.name + ")\n";
-  instructions += "ADD :addr(SCREENINDEX)\n";
+  instructions += "ADD :addr(SHARED_INDEX)\n";
   instructions += "SAD :addr(" + a2.name + ")\n";
   return instructions;
 }
@@ -205,6 +205,18 @@ std::string cos::print_instruction() {
   instructions += "ADD :addr(SININDEX)\n";
   instructions += "STA :addr(DUMMY)\n";
   instructions += "GAD :addr(DUMMY)\n"; //get @ address
+  return instructions;
+}
+
+write_at::write_at() {
+  nb_ins = 2;
+  type = WRITE_AT;
+}
+
+std::string write_at::print_instruction() {
+  std::string instructions = "";
+  instructions += "GET :addr(" + a1.name + ")\n";
+  instructions += "SAD :addr(" + a2.name + ")\n"; //get @ address
   return instructions;
 }
 
