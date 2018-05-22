@@ -147,6 +147,23 @@ architecture rtl of top_projet is
     );
   end component;
 
+  component sinus_table is
+  generic (
+    data_size         : integer;    -- Taille de chaque mot stocké
+    address_size      : integer     -- Largeur de l'adresse
+  );
+  port (
+    clk                : in  std_logic;
+    
+    en                 : in  std_logic;
+    bus_data_in        : out std_logic_vector(data_size-1 downto 0);
+    bus_data_out       : in  std_logic_vector(data_size-1 downto 0);
+    bus_address        : in  std_logic_vector(address_size-1 downto 0);
+    bus_R_W            : in  std_logic;
+    bus_en             : in  std_logic
+  );
+  end component;
+
   -- Gestionnaire de périphériques du CPU
   component cpu_periph_manager is
   generic (
@@ -159,7 +176,8 @@ architecture rtl of top_projet is
     cpu_ram_en      : out std_logic;
     cpu_shr_ram_en  : out std_logic;
     spi_en          : out std_logic;
-    gpio_ctrl_en    : out std_logic
+    gpio_ctrl_en    : out std_logic;
+    sinus_table_en  : out std_logic
     );
   end component;
 
@@ -240,6 +258,7 @@ architecture rtl of top_projet is
   signal cpu_shr_ram_en     : std_logic;
   --signal spi_en             : std_logic;
   signal gpio_en            : std_logic;
+  signal sinus_table_en     : std_logic;
 
   /* Signaux du GPU */
   signal gpu_bus_en         : std_logic;
@@ -324,7 +343,8 @@ inst_cpu_periph_manager : cpu_periph_manager
     cpu_ram_en      => cpu_ram_en,
     cpu_shr_ram_en  => cpu_shr_ram_en,
     spi_en          => open,
-    gpio_ctrl_en    => gpio_en
+    gpio_ctrl_en    => gpio_en,
+    sinus_table_en  => sinus_table_en
     );
 
 /* La RAM du CPU */
@@ -343,6 +363,22 @@ inst_ram_cpu : ram_simple
     bus_address     => cpu_bus_address,
     bus_R_W         => cpu_bus_R_W,
     bus_en          => cpu_bus_en
+  );   
+
+/* Table des sinus */
+inst_sinus_table : sinus_table
+  generic map (
+    data_size        => data_size,
+    address_size     => address_size
+  )
+  port map ( 
+    clk             => clk,
+    en              => cpu_ram_en,         
+    bus_data_in     => cpu_bus_data_in,
+    bus_data_out    => cpu_bus_data_out,
+    bus_address     => cpu_bus_address,
+    bus_R_W         => cpu_bus_R_W,
+    bus_en          => sinus_table_en
   );   
 
 /* Contrôleur GPIO */

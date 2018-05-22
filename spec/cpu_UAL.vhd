@@ -166,7 +166,14 @@ begin
   -- OP_JMP
       when "10010" =>
 
+  -- OP_GET
+      when "10011" =>
+        data_out_with_carry (data_size-1 downto 0) <= data_A;
 
+  -- OP_GAD
+      when "11000" =>
+        data_out_with_carry (data_size-1 downto 0) <= data_A;
+        
   -- Tests sur les entiers et les virgules fixes
   -- OP_TGT
       when "10100" =>

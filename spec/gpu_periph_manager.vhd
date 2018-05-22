@@ -40,7 +40,7 @@ begin
         when 16#02000# to 16#02fff# =>
           gpu_shr_ram_en <= '1';
 
-        when 16#80000# to 16#cafff# =>
+        when 16#80000# to 16#cb000# =>
           vga_bitmap_en <= '1';
 
         when others =>

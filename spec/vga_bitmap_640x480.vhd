@@ -45,7 +45,28 @@ architecture Behavioral of VGA_bitmap_640x480 is
 -- Graphic RAM type. this object is the content of the displayed image
 type GRAM is array (0 to 307199) of std_logic_vector(bit_per_pixel - 1 downto 0); 
 
-signal screen      : GRAM;                           -- the memory representation of the image
+  component ram_screen is
+    Port ( 
+      clka    : in STD_LOGIC;
+      wea     : in STD_LOGIC_VECTOR ( 0 to 0 );
+      addra   : in STD_LOGIC_VECTOR ( 18 downto 0 );
+      dina    : in STD_LOGIC_VECTOR ( 3 downto 0 );
+      douta   : out STD_LOGIC_VECTOR ( 3 downto 0 )
+    );
+  end component;
+
+signal we_0         : std_logic;
+signal addr_0       : std_logic_vector(18 downto 0);
+signal din_0        : std_logic_vector(3 downto 0);
+signal dout_0       : std_logic_vector(3 downto 0);
+
+signal we_1         : std_logic;
+signal addr_1       : std_logic_vector(18 downto 0);
+signal din_1        : std_logic_vector(3 downto 0);
+signal dout_1       : std_logic_vector(3 downto 0);
+
+signal current_buffer    : integer range 0 to 1 := 0;
+signal screen_buffer_rdy : std_logic := '0';                   -- JB - flag to ask for a screen refresh
 
 signal h_counter   : integer range 0 to 3199:=0;     -- counter for H sync. (size depends of frequ because of division)
 signal v_counter   : integer range 0 to 520 :=0;     -- counter for V sync. (base on v_counter, so no frequ issue)
@@ -56,20 +77,67 @@ signal TOP_display : boolean := false;               -- this signal is true when
 signal pix_read_addr : integer range 0 to 307199:=0;  -- the address at which displayed data is read
 
 signal next_pixel : std_logic_vector(bit_per_pixel - 1 downto 0);  -- the data coding the value of the pixel to be displayed
-
+  
 begin
 
+ram_screen_0 : ram_screen
+  port map ( 
+      clka    => clk,
+      wea(0)  => we_0,
+      addra   => addr_0,
+      dina    => din_0,
+      douta   => dout_0
+    );
 
--- This process performs data access (read and write) to the memory
+ram_screen_1 : ram_screen
+  port map ( 
+      clka    => clk,
+      wea(0)  => we_1,
+      addra   => addr_1,
+      dina    => din_1,
+      douta   => dout_1
+    );
+
+-- buffer 0 is accessible by the CPU when it's not shown
+we_0      <= data_write when current_buffer = 1 else '0';
+addr_0    <= ADDR       when current_buffer = 1 else std_logic_vector(to_unsigned(pix_read_addr, addr_0'length));
+din_0     <= data_in    when current_buffer = 1 else (others => '0');
+
+-- buffer 1 is accessible by the CPU when it's not shown
+we_1      <= data_write when current_buffer = 0 else '0';
+addr_1    <= ADDR       when current_buffer = 0 else std_logic_vector(to_unsigned(pix_read_addr, addr_1'length));
+din_1     <= data_in    when current_buffer = 0 else (others => '0');
+
+-- CPU's reads are on the not currently shown buffer
+data_out  <= "000" & screen_buffer_rdy  when ADDR = std_logic_vector(to_unsigned(16#cb000#, ADDR'length))
+          else dout_0   when current_buffer = 1
+          else dout_1;
+
+-- Pixel's value is read on the currently shown buffer
+next_pixel  <= dout_0     when current_buffer = 0 else dout_1;
+
+
 memory_management : process(clk)
 begin
-   if clk'event and clk='1' then
-      next_pixel <= screen(pix_read_addr);
-      data_out   <= screen(to_integer(unsigned(ADDR)));
-      if data_write = '1' then
-         screen(to_integer(unsigned(ADDR))) <= data_in;
+  if rising_edge(clk) then
+
+    if data_write = '1' and data_in(0) = '1' and ADDR = std_logic_vector(to_unsigned(16#cb000#, ADDR'length)) then -- CPU has finished filling the buffer
+      screen_buffer_rdy <= '1';
+
+    end if;
+
+    -- Vsync
+    if v_counter = 0 and screen_buffer_rdy = '1' then
+      if current_buffer = 0 then
+        current_buffer <= 1;
+      else
+        current_buffer <= 0;
       end if;
-   end if;
+      
+      screen_buffer_rdy <= '0';
+    end if;
+
+  end if;
 end process;
 
 

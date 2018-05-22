@@ -8,14 +8,16 @@ use IEEE.numeric_std.all;
 
 entity mux is
     generic (
-            size : integer := 6
+            size : integer
         );
     port (
-        sel : in std_logic;
+        sel       : in std_logic_vector(1 downto 0);
 
-        data_0   : in  std_logic_vector (size-1 downto 0);
-        data_1   : in  std_logic_vector (size-1 downto 0);
-        data_out : out std_logic_vector (size-1 downto 0)
+        data_0    : in  std_logic_vector (size-1 downto 0);
+        data_1    : in  std_logic_vector (size-1 downto 0);
+        data_2    : in  std_logic_vector (size-1 downto 0);
+        
+        data_out  : out std_logic_vector (size-1 downto 0)
         );
 
 end entity mux;
@@ -24,6 +26,11 @@ architecture rtl of mux is
 
 begin
 
-    data_out <= data_1 when sel = '1' else data_0;
+    with sel select 
+    data_out <= 
+      data_0 when "00",
+      data_1 when "01",
+      data_2 when "10",
+      data_0 when others;
 
 end;

@@ -6,9 +6,6 @@ use IEEE.numeric_std.all;
  -- Main Author : Julien BESSE
  -- With the kind collaboration of : Pierre JOUBERT
 
- --library xil_defaultlib;
- --use xil_defaultlib.op_codes.all;
-
  entity FSM is
   generic (
     op_code_size : integer  -- Largeur du signal des instructions
@@ -26,7 +23,7 @@ use IEEE.numeric_std.all;
     load_cpt : out std_logic;
 
     -- mux
-    sel_mux  : out std_logic;
+    sel_mux  : out std_logic_vector(1 downto 0);
 
     -- Registres (et la bascule FF)
     init_ff  : out std_logic;
@@ -35,6 +32,7 @@ use IEEE.numeric_std.all;
     load_ri  : out std_logic;
     load_rd  : out std_logic;
     load_ra  : out std_logic;
+    load_ad  : out std_logic;
 
     -- UAL
     sel_ual  : out std_logic_vector (op_code_size-1 downto 0);
@@ -51,45 +49,11 @@ end entity FSM;
 
 architecture rtl of FSM is
 
-  
---  constant op_code_size : integer := 5;
-  -- Instructions logiques
-  constant OP_NOR  : std_logic_vector (op_code_size-1 downto 0) := "00000";
-  constant OP_OR   : std_logic_vector (op_code_size-1 downto 0) := "00001";
-  constant OP_AND  : std_logic_vector (op_code_size-1 downto 0) := "00010";
-  constant OP_XOR  : std_logic_vector (op_code_size-1 downto 0) := "00011";
-  
-  -- Instructions mathématiques sur entiers
-  constant OP_ADD  : std_logic_vector (op_code_size-1 downto 0) := "00100";
-  constant OP_SUB  : std_logic_vector (op_code_size-1 downto 0) := "00101";
-  constant OP_DIV  : std_logic_vector (op_code_size-1 downto 0) := "00110";
-  constant OP_MUL  : std_logic_vector (op_code_size-1 downto 0) := "00111";
-  --constant OP_MOD  : std_logic_vector (op_code_size-1 downto 0) := "01000";
-
-  -- Instructions mathématiques sur flottants
-  constant OP_ADDF : std_logic_vector (op_code_size-1 downto 0) := "01001";
-  --constant OP_DIVF : std_logic_vector (op_code_size-1 downto 0) := "01010";
-  constant OP_MULF : std_logic_vector (op_code_size-1 downto 0) := "01011";
-
-  -- Conversions flottants/entiers
-  constant OP_FTOI : std_logic_vector (op_code_size-1 downto 0) := "01100";
-  constant OP_ITOF : std_logic_vector (op_code_size-1 downto 0) := "01101";
-
-  -- Opérations mémoire
-  constant OP_STA  : std_logic_vector (op_code_size-1 downto 0) := "10000";
-  constant OP_JCC  : std_logic_vector (op_code_size-1 downto 0) := "10001";
-  constant OP_JMP  : std_logic_vector (op_code_size-1 downto 0) := "10010";
-  constant OP_GET  : std_logic_vector (op_code_size-1 downto 0) := "10011";
-
-  -- Tests sur les entiers
-  constant OP_TGT  : std_logic_vector (op_code_size-1 downto 0) := "10100";
-  constant OP_TLT  : std_logic_vector (op_code_size-1 downto 0) := "10101";
-  constant OP_TEQ  : std_logic_vector (op_code_size-1 downto 0) := "10110";
-
-
-  type STATES is (INIT, FETCH_INST, DECODE, FETCH_OP, EXE_UAL, STA, EXE_JCC); 
+  type STATES is (INIT, FETCH_INST, DECODE, FETCH_OP_STATIC, FETCH_OP_DYNAMIC, FETCH_ADDR, EXE_UAL, STA_STATIC, STA_DYNAMIC, EXE_JCC, EXE_JMP); 
   signal state : STATES;
   signal next_state : STATES;
+  
+
   begin
 
     process(state, op_code) is
@@ -97,51 +61,62 @@ architecture rtl of FSM is
 
       case state is
       when INIT =>
-      next_state <= FETCH_INST;
+        next_state <= FETCH_INST;
 
       when FETCH_INST =>
-      next_state <= DECODE;
+        next_state <= DECODE;
 
       when DECODE =>
         case op_code is
-          when OP_STA =>
-            next_state <= STA;
+          when "10000" => -- OP_STA
+            next_state <= STA_STATIC;
 
-          when OP_JCC =>
+          when "10001" => -- OP_JCC
             next_state <= EXE_JCC;
 
-          when others =>
-            next_state <= FETCH_OP;
+          when "10010" => -- OP_JMP
+            next_state <= EXE_JMP;
+
+          when "11000" => -- OP_GAD
+            next_state <= FETCH_ADDR;
+
+          when "11001" => -- OP_SAD
+            next_state <= FETCH_ADDR;
+
+          when others =>  -- Opérations arithmétiques et logiques, ainsi que le GET pour que la donnée passe par l'UAL pour aller dans ACCU
+            next_state <= FETCH_OP_STATIC;
 
         end case;
 
-           -- if op_code = OP_STA then -- MSB de l'op-code à 0 = Opération arithmétique ou logique 
-           -- next_state <= FETCH_OP;
---
-           -- elsif op_code = "10000" then
-           -- next_state <= STA;
---
-           -- elsif op_code = "10001" then
-           -- next_state <= EXE_JCC;
---
-           -- else 
-           -- next_state <= FETCH_OP;
+      when FETCH_ADDR =>
+        if op_code = "11000" then -- OP_GAD
+          next_state <= FETCH_OP_DYNAMIC;
+        else 
+          next_state <= STA_DYNAMIC;
+        end if;
 
-          --end if;
-
-        when FETCH_OP =>
+      when FETCH_OP_STATIC =>
         next_state <= EXE_UAL;
 
-        when EXE_UAL =>
+      when FETCH_OP_DYNAMIC =>
+        next_state <= EXE_UAL;
+
+      when EXE_UAL =>
         next_state <= FETCH_INST;      
 
-        when STA =>
+      when STA_STATIC =>
         next_state <= FETCH_INST;
 
-        when EXE_JCC =>
+      when STA_DYNAMIC =>
         next_state <= FETCH_INST;
 
-        when others =>
+      when EXE_JCC =>
+        next_state <= FETCH_INST;
+
+      when EXE_JMP =>
+        next_state <= FETCH_INST;
+
+      when others =>
         next_state <= INIT;
 
       end case;
@@ -158,8 +133,9 @@ architecture rtl of FSM is
           init_acc <= '1';
           en_cpt   <= '0';
           load_cpt <= '0';
-          sel_mux  <= '0';
+          sel_mux  <= "00";
           init_ff  <= '1';
+          load_ad  <= '0';
           load_ff  <= '0';
           load_ri  <= '0';
           load_rd  <= '0';
@@ -174,10 +150,11 @@ architecture rtl of FSM is
           en_mem   <= '1';
           R_W      <= '0';
 
+          load_ad  <= '0';
           init_cpt <= '0';
           init_acc <= '0';
           load_cpt <= '0';
-          sel_mux  <= '0';
+          sel_mux  <= "00";
           init_ff  <= '0';
           load_ff  <= '0';
           load_rd  <= '0';
@@ -185,8 +162,9 @@ architecture rtl of FSM is
           sel_ual  <= (others => '0');     
 
         when DECODE =>
-          sel_mux  <= '1';
+          sel_mux  <= "01";
 
+          load_ad  <= '0';
           init_cpt <= '0';
           init_acc <= '0';
           en_cpt   <= '0';
@@ -200,12 +178,13 @@ architecture rtl of FSM is
           en_mem   <= '0';
           sel_ual  <= (others => '0');
 
-        when FETCH_OP =>
-          sel_mux  <= '1';
+        when FETCH_ADDR =>
+          sel_mux  <= "01";
           en_mem   <= '1';
           R_W      <= '0';
-          load_rd  <= '1';
+          load_ad  <= '1';
 
+          load_rd  <= '0';
           init_cpt <= '0';
           init_acc <= '0';
           en_cpt   <= '0';
@@ -216,18 +195,55 @@ architecture rtl of FSM is
           load_ra  <= '0';
           sel_ual  <= (others => '0');
 
+        when FETCH_OP_STATIC =>
+          sel_mux  <= "01";
+          en_mem   <= '1';
+          R_W      <= '0';
+          load_rd  <= '1';
+
+          load_ad  <= '0';
+          init_cpt <= '0';
+          init_acc <= '0';
+          en_cpt   <= '0';
+          load_cpt <= '0';
+          init_ff  <= '0';
+          load_ff  <= '0';
+          load_ri  <= '0';
+          load_ra  <= '0';
+          sel_ual  <= (others => '0');
+
+        when FETCH_OP_DYNAMIC =>
+          sel_mux  <= "10";
+          en_mem   <= '1';
+          R_W      <= '0';
+          load_rd  <= '1';
+
+          init_cpt <= '0';
+          init_acc <= '0';
+          en_cpt   <= '0';
+          load_cpt <= '0';
+          load_ad  <= '0';
+          init_ff  <= '0';
+          load_ff  <= '0';
+          load_ri  <= '0';
+          load_ra  <= '0';
+          sel_ual  <= (others => '0');
+
         when EXE_UAL =>
-          sel_mux  <= '1';
+          sel_mux  <= "01";
           sel_ual  <= op_code;
           load_ra  <= '1';
-          if op_code = "00100"
-          or op_code = "00101"
-          or op_code = "00111"
-          or op_code = "10100"
-          or op_code = "10101"
-          or op_code = "10110"
+          if op_code = "00100" -- OP_ADD
+          or op_code = "00101" -- OP_SUB
+          or op_code = "00110" -- OP_DIV
+          or op_code = "00111" -- OP_MUL
+          or op_code = "10100" -- OP_FTOI
+          or op_code = "10101" -- OP_ITOF
+          or op_code = "10100" -- OP_TGT
+          or op_code = "10101" -- OP_TLT
+          or op_code = "10110" -- OP_TEQ
           then
-            load_ff  <= '1'; -- On enregistre l'éventuelle retenue
+            load_ff  <= '1'; 
 
           else
             load_ff  <= '0';
@@ -239,13 +255,30 @@ architecture rtl of FSM is
         en_cpt   <= '0';
         load_cpt <= '0';
         init_ff  <= '0';
+        load_ad  <= '0';
         load_ri  <= '0';
         load_rd  <= '0';
         R_W      <= '0';
         en_mem   <= '0';
 
-      when STA =>
-        sel_mux  <= '1';
+      when STA_STATIC =>
+        sel_mux  <= "01";
+        en_mem   <= '1';
+        R_W      <= '1';
+
+        init_cpt <= '0';
+        init_acc <= '0';
+        en_cpt   <= '0';
+        load_cpt <= '0';
+        init_ff  <= '0';
+        load_ff  <= '0';
+        load_ri  <= '0';
+        load_rd  <= '0';
+        load_ra  <= '0';
+        sel_ual  <= (others => '0');
+
+      when STA_DYNAMIC =>
+        sel_mux  <= "10";
         en_mem   <= '1';
         R_W      <= '1';
 
@@ -261,7 +294,7 @@ architecture rtl of FSM is
         sel_ual  <= (others => '0');
 
       when EXE_JCC =>
-        sel_mux  <= '1';
+        sel_mux  <= "01";
         init_ff  <= carry;
         load_cpt <= not carry;
         load_ri  <= '1';
@@ -269,12 +302,31 @@ architecture rtl of FSM is
         init_cpt <= '0';
         init_acc <= '0';
         en_cpt   <= '0';
+        load_ad  <= '0';
         load_ff  <= '0';
         load_rd  <= '0';
         load_ra  <= '0';
         R_W      <= '0';
         en_mem   <= '0';
         sel_ual  <= (others => '0');
+
+      when EXE_JMP =>
+        sel_mux  <= "01";
+        init_ff  <= '0';
+        load_cpt <= '1';
+        load_ri  <= '1';
+
+        init_cpt <= '0';
+        init_acc <= '0';
+        en_cpt   <= '0';
+        load_ad  <= '0';
+        load_ff  <= '0';
+        load_rd  <= '0';
+        load_ra  <= '0';
+        R_W      <= '0';
+        en_mem   <= '0';
+        sel_ual  <= (others => '0');
+
     end case;
   end process;
 

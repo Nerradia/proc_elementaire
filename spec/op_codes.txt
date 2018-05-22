@@ -1,0 +1,34 @@
+"00000"; -- OP_NOR 
+"00001"; -- OP_OR 
+"00010"; -- OP_AND 
+"00011"; -- OP_XOR 
+  
+  -- Instructions mathématiques sur entiers
+"00100"; -- OP_ADD 
+"00101"; -- OP_SUB 
+"00110"; -- OP_DIV 
+"00111"; -- OP_MUL 
+"01000"; -- OP_MOD 
+
+  -- Instructions mathématiques sur flottants
+"01001"; -- OP_ADDF 
+"01010"; -- OP_DIVF 
+"01011"; -- OP_MULF 
+
+  -- Conversions flottants/entiers
+"01100"; -- OP_FTOI 
+"01101"; -- OP_ITOF 
+
+  -- Opérations mémoire
+"10000"; -- OP_STA 
+"10001"; -- OP_JCC 
+"10010"; -- OP_JMP 
+"10011"; -- OP_GET 
+"11000"; -- OP_GAD
+"11001"; -- OP_SAD
+
+  -- Tests sur les entiers
+"10100"; -- OP_TGT 
+"10101"; -- OP_TLT 
+"10110"; -- OP_TEQ 
+

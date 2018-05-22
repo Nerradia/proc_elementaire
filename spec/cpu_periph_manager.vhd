@@ -17,7 +17,8 @@ entity cpu_periph_manager is
     cpu_ram_en      : out std_logic;
     cpu_shr_ram_en  : out std_logic;
     spi_en          : out std_logic;
-    gpio_ctrl_en    : out std_logic
+    gpio_ctrl_en    : out std_logic;
+    sinus_table_en  : out std_logic
     );
 
 end entity cpu_periph_manager;
@@ -33,6 +34,7 @@ begin
     cpu_shr_ram_en   <= '0';
     spi_en           <= '0';
     gpio_ctrl_en     <= '0';
+    sinus_table_en   <= '0';
     
     if cpu_bus_en = '1' then
       case to_integer(unsigned(cpu_bus_address)) is
@@ -41,6 +43,9 @@ begin
 
         when 16#02000# to 16#02fff# =>
           cpu_shr_ram_en   <= '1';
+
+        when 16#03000# to 16#03FFF# =>
+          sinus_table_en   <= '1';
 
         when 16#80000# =>
           spi_en       <= '1';
