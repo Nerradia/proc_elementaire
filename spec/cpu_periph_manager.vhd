@@ -44,7 +44,7 @@ begin
         when 16#02000# to 16#02fff# =>
           cpu_shr_ram_en   <= '1';
 
-        when 16#03000# to 16#03FFF# =>
+        when 16#03000# to 16#03fff# =>
           sinus_table_en   <= '1';
 
         when 16#80000# =>

@@ -200,7 +200,7 @@ architecture rtl of top_projet is
   -- Mémoire double-port pour l'interconnexion
   component ram_double is
     generic (
-      data_size    : integer := 8;    -- Taille de chaque mot stocké
+      data_size    : integer := 8;     -- Taille de chaque mot stocké
       address_size : integer := 6      -- Largeur de l'adresse de la RAM
     );
     port (
@@ -373,12 +373,12 @@ inst_sinus_table : sinus_table
   )
   port map ( 
     clk             => clk,
-    en              => cpu_ram_en,         
+    en              => sinus_table_en,         
     bus_data_in     => cpu_bus_data_in,
     bus_data_out    => cpu_bus_data_out,
     bus_address     => cpu_bus_address,
     bus_R_W         => cpu_bus_R_W,
-    bus_en          => sinus_table_en
+    bus_en          => cpu_bus_en
   );   
 
 /* Contrôleur GPIO */
