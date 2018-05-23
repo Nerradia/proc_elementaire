@@ -29,6 +29,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <vector>
+#include <stack>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -176,7 +177,12 @@ std::string argument_condition1 (std::string str, std::string type) {
 }
 
 std::string argument_condition2 (std::string str, std::string type) {
-  unsigned first = str.find(type) + 1;
+  unsigned first;
+  if (type == "==")
+    first = str.find(type) + 2;
+  else
+    first = str.find(type) + 1;
+
   unsigned last = str.find(")");
   std::string strNew = str.substr (first, last-first);
   return strNew;
@@ -216,10 +222,22 @@ int loop_to_close (std::vector<instruction*> & ins_v) {
   return 0;
 }
 
-int loop_to_loop (std::vector<instruction*> & ins_v) {
+int loop_to_loop (std::vector<instruction*> & ins_v, int toClose) {
+  /*
   for ( unsigned int i = ins_v.size() - 1; i > 0; i-- ) {
     if(ins_v[i]->type == TANT_QUE)
       if(! ins_v[i]->is_closed) {
+        printf("looping %d at address %d\n",ins_v[i]->num, ins_v[i]->address );
+        ins_v[i]->is_closed = true;
+        return ins_v[i]->address;
+      }
+  }
+  return 0;
+  */
+  for ( unsigned int i = ins_v.size() - 1; i > 0; i-- ) {
+    if(ins_v[i]->type == TANT_QUE)
+      if(ins_v[i]->num == toClose) {
+        printf("looping %d at address %d\n",ins_v[i]->num, ins_v[i]->address );
         ins_v[i]->is_closed = true;
         return ins_v[i]->address;
       }
@@ -260,8 +278,12 @@ int main(int argc, char const *argv[])
 
   std::vector<var>            var_v;
   std::vector<instruction*>   ins_v;
-  int cpt_cond = 0;
-  int cpt_loop = 0;
+
+  std::stack<int> conditions;
+  std::stack<int> loops;
+
+  int id_cond = 0;
+  int id_loop = 0;
 
   /*implementation of standard constants*/
     var v;
@@ -384,14 +406,18 @@ int main(int argc, char const *argv[])
       ins_v.push_back(ins);
     
     } else if ( line.find("fin_si") != std::string::npos ) {
-      ins = new endif;      
+      ins = new endif;
+      ins->num = conditions.top();
+      conditions.pop();
       ins_v.push_back(ins);
 
     } else if (    line.find("si")  != std::string::npos 
                 && line.find("sin") == std::string::npos) {
       condition *cond = new condition;
       cond->set_condition_type ( condition_type (line) );
-      cond->num = cpt_cond++;
+      cond->num = id_cond;
+      conditions.push(id_cond);
+      id_cond++;
       v.name = argument_condition1 (line, cond->condition_type);
       //we check if it's an undeclared constant
       if(isInteger(v.name) && ! is_declared(v.name, var_v)){
@@ -420,7 +446,14 @@ int main(int argc, char const *argv[])
         var_v.push_back(v);
       }
       cond->set_argument1 ( v );
-
+      //set the return variable
+      v.name = variable_to_change(line);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      cond->set_return_var( v );
       ins_v.push_back(cond);
 
     } else if ( line.find("cos(")  != std::string::npos ) {
@@ -433,20 +466,30 @@ int main(int argc, char const *argv[])
         var_v.push_back(v);
       }
       cond->set_argument1 ( v );
-
+      
+      //set the return variable
+      v.name = variable_to_change(line);
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      cond->set_return_var( v );
+      
       ins_v.push_back(cond);
 
     } else if ( line.find("fin_tant_que")  != std::string::npos ) {
       ins = new endloop;
-      cpt_loop--;
-      ins->num = cpt_loop;
+      ins->num = loops.top();
+      loops.pop();
       ins_v.push_back(ins);
 
     } else if ( line.find("tant_que")  != std::string::npos ) {
       loop *lo = new loop;
       lo->set_condition_type ( condition_type (line) );
-      lo->num = cpt_loop;
-      cpt_loop++;
+      lo->num = id_loop;
+      loops.push(id_loop);
+      id_loop++;
       v.name = argument_condition1 (line, lo->condition_type);
       //we check if it's an undeclared constant
       if(isInteger(v.name) && ! is_declared(v.name, var_v)){
@@ -515,6 +558,20 @@ int main(int argc, char const *argv[])
       ins->set_argument2( v );
       ins_v.push_back(ins);
 
+    } else if ( line.find("lire_a")  != std::string::npos ) {
+      ins = new read_at;
+      //first, find the variable to update
+      v.name = variable_to_change(line);
+      ins->set_return_var( v );
+      //then find the argument
+      v.name = argument_condition1(line,")");
+      //we check if it's an undeclared constant
+      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
+        v.value = atol(v.name.c_str());
+        var_v.push_back(v);
+      }
+      ins->set_argument1( v );
+      ins_v.push_back(ins);
     } else if ( line.find("=")  != std::string::npos ) {
       ins = new affectation;
       //first, find the variable to update
@@ -527,7 +584,7 @@ int main(int argc, char const *argv[])
         v.value = atol(v.name.c_str());
         var_v.push_back(v);
       }
-      printf("var : %s value :%x\n", v.name.c_str(), v.value );
+      //printf("var : %s value :%x\n", v.name.c_str(), v.value );
       ins->set_argument1( v );
       ins_v.push_back(ins);
     } else {
@@ -548,8 +605,9 @@ int main(int argc, char const *argv[])
       //we are in a condition
       char temp1[30] = "";
       char temp2[30] = "";
-      sprintf (temp1, ":condition(%d)", condition_to_close (ins_v));
+      sprintf (temp1, ":condition(%d)", ins_v[i]->num);
       sprintf (temp2, "%05x", index_ram);
+      printf("replacing: %s by %s .\n", temp1, temp2 );
       whole_file = ReplaceAll (whole_file, std::string(temp1), std::string(temp2));
     }
 
@@ -557,12 +615,15 @@ int main(int argc, char const *argv[])
        //we are in a condition
       char temp1[30] = "";
       char temp2[30] = "";
-      int toClose = loop_to_close(ins_v);
+      printf(" numéro de l'instruction: %d\n", ins_v[i]->num );
+      int toClose = ins_v[i]->num;
       sprintf (temp1, ":endloop(%d)", toClose);
       sprintf (temp2, "%05x", index_ram); //TODO: verify that
+      printf("replacing: %s by %s .\n", temp1, temp2 );
       whole_file = ReplaceAll (whole_file, std::string(temp1), std::string(temp2));
       sprintf (temp1, ":loop(%d)", toClose);
-      sprintf (temp2, "%05x", loop_to_loop(ins_v)); //TODO: verify that
+      sprintf (temp2, "%05x", loop_to_loop(ins_v,toClose)); //TODO: verify that
+      printf("replacing: %s by %s .\n", temp1, temp2 );
       whole_file = ReplaceAll (whole_file, std::string(temp1), std::string(temp2));
     }
   }
@@ -593,15 +654,15 @@ int main(int argc, char const *argv[])
   //whole_file = whole_file + "\n\n";
   write( out_f, whole_file.c_str(), strlen(whole_file.c_str()));
 
-  if ( cpt_loop < 0)
-    std::cerr << "\033[1;31mError: " << cpt_loop * -1 << " more loop closed than open\033[0m" << std::endl;
-  if ( cpt_loop > 0)
-    std::cerr << "\033[1;31mError: " << cpt_loop << " loop(s) has not been closed\033[0m" << std::endl;
+  if ( conditions.size() < 0)
+    std::cerr << "\033[1;31mError: " << loops.size() * -1 << " more loop closed than open\033[0m" << std::endl;
+  if ( conditions.size() > 0)
+    std::cerr << "\033[1;31mError: " << loops.size() << " loop(s) has not been closed\033[0m" << std::endl;
 
-  if ( cpt_cond < 0)
-    std::cerr << "\033[1;31mError: " << cpt_cond * -1 << " more condition(s) closed than open\033[0m" << std::endl;
-  if ( cpt_cond > 0)
-    std::cerr << "\033[1;31mError: " << cpt_cond << " condition(s) has not been closed\033[0m" << std::endl;
+  if ( conditions.size() < 0)
+    std::cerr << "\033[1;31mError: " << conditions.size() * -1 << " more condition(s) closed than open\033[0m" << std::endl;
+  if ( conditions.size() > 0)
+    std::cerr << "\033[1;31mError: " << conditions.size() << " condition(s) has not been closed\033[0m" << std::endl;
 
   printf("This program has a total of %d lines = %.2f%% of the maximum\n", 
           index_ram,

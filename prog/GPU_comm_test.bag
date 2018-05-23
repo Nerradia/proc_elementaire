@@ -1,0 +1,11 @@
+entier a;
+entier b;
+
+a = 0;
+b = 0;
+
+tant_que(1 < 2)
+  b = lire_a ( 8199 );
+  a = a + b;
+  ecrire_a ( a, 8200 );
+fin_tant_que;

@@ -1,0 +1,21 @@
+entier a;
+entier b;
+a = 1;
+b = 0;
+afficher_LCD(a);
+tant_que(7 > 2)
+  a = a + 1;
+  tant_que(a > 1000000) 
+    a = 0;
+    b = b + 1;
+  fin_tant_que;
+  tant_que(b > 100) 
+    b = 0; 
+    tant_que(b > 10)
+      b = b - 1;
+    fin_tant_que;
+    a = 0;
+  fin_tant_que;
+afficher_LCD(a);
+fin_tant_que;
+afficher_LCD(42);

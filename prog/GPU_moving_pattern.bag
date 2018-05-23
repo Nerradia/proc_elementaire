@@ -1,0 +1,20 @@
+entier adresse;
+entier a;
+
+entier temp;
+entier valid;
+
+a = 0;
+tant_que(1<2)
+  valid = lire_a(831488);
+  si (valid  < 1)
+    adresse = 524288;
+    tant_que(adresse < 831487)
+      temp = adresse + a;
+      ecrire_a (temp, adresse);
+      adresse = adresse + 1;
+    fin_tant_que;
+    ecrire_a (1, 831488);
+    a = a + 1;
+  fin_si;
+fin_tant_que;  

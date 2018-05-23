@@ -25,7 +25,8 @@ typedef enum {
   ECRITURE_MEMOIRE,
   SIN,
   COS,
-  WRITE_AT
+  WRITE_AT,
+  READ_AT
 } INS_TYPE;
 
 
@@ -155,6 +156,13 @@ class write_at : public instruction {
 public:
   write_at();
   ~write_at();
+  std::string print_instruction();
+};
+
+class read_at : public instruction {
+public:
+  read_at();
+  ~read_at();
   std::string print_instruction();
 };
 

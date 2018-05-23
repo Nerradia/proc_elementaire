@@ -1,0 +1,13 @@
+entier a;
+entier b;
+a = 3;
+b = 0;
+afficher_LCD(0);
+
+si (a == 1) 
+  afficher_LCD(1);
+fin_si;
+
+si (a < 5) 
+  afficher_LCD(2);
+fin_si;

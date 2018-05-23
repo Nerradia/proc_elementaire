@@ -136,7 +136,7 @@ std::string loop::print_instruction() {
 }
 
 endloop::endloop() {
-  nb_ins = 2;
+  nb_ins = 1;
   type = FIN_TANT_QUE;
 }
 
@@ -144,8 +144,7 @@ std::string endloop::print_instruction() {
 //we print the JCC twice to be sure that we correctly jump
   std::string instructions = "";
 
-  instructions += "JCC :loop(" + std::to_string(num) + ")\n";
-  instructions += "JCC :loop(" + std::to_string(num) + ")\n";
+  instructions += "JMP :loop(" + std::to_string(num) + ")\n";
 
   return instructions;
 }
@@ -178,7 +177,7 @@ std::string write_to_shared::print_instruction() {
 }
 
 sine::sine() {
-  nb_ins = 5;
+  nb_ins = 6;
   type = SIN;
 }
 
@@ -189,11 +188,12 @@ std::string sine::print_instruction() {
   instructions += "ADD :addr(SININDEX)\n";
   instructions += "STA :addr(DUMMY)\n";
   instructions += "GAD :addr(DUMMY)\n"; //get @ address
+  instructions += "STA :addr(" + var_.name + ")\n"; //store in the return var
   return instructions;
 }
 
 cos::cos() {
-  nb_ins = 6;
+  nb_ins = 7;
   type = COS;
 }
 
@@ -205,6 +205,7 @@ std::string cos::print_instruction() {
   instructions += "ADD :addr(SININDEX)\n";
   instructions += "STA :addr(DUMMY)\n";
   instructions += "GAD :addr(DUMMY)\n"; //get @ address
+  instructions += "STA :addr(" + var_.name + ")\n"; //store in the return var
   return instructions;
 }
 
@@ -216,7 +217,19 @@ write_at::write_at() {
 std::string write_at::print_instruction() {
   std::string instructions = "";
   instructions += "GET :addr(" + a1.name + ")\n";
-  instructions += "SAD :addr(" + a2.name + ")\n"; //get @ address
+  instructions += "SAD :addr(" + a2.name + ")\n"; //set @ address
+  return instructions;
+}
+
+read_at::read_at() {
+  nb_ins = 2;
+  type = READ_AT;
+}
+
+std::string read_at::print_instruction() {
+  std::string instructions = "";
+  instructions += "GAD :addr(" + a1.name + ")\n"; //get @ address
+  instructions += "STA :addr(" + var_.name + ")\n"; //store in the return var
   return instructions;
 }
 

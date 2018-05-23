@@ -1,0 +1,13 @@
+entier adresse;
+entier a;
+
+entier temp;
+
+a = 0;
+adresse = 524288;
+tant_que(adresse < 831487)
+  temp = adresse + a;
+  ecrire_a (temp, adresse);
+  adresse = adresse + 1;
+fin_tant_que;
+ecrire_a (1, 831488);

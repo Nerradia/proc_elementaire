@@ -1,0 +1,4 @@
+entier a;
+a = sin(4);
+afficher_LCD (a);
+

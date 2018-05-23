@@ -1,0 +1,61 @@
+entier x0;
+entier y0;
+entier x1;
+entier y1;
+
+entier dx;
+entier dy;
+entier dp;
+
+entier deltaE;
+entier deltaNE;
+entier x;
+entier y;
+
+entier adresse;
+entier propre;
+
+x0 = lire_a(8192);
+y0 = lire_a(8193);
+x1 = lire_a(8194);
+y1 = lire_a(8195);
+
+dx = x1 - x0;
+dy = y1 - y0;
+dp = 2 * dy;
+dp = dp - dx;
+
+deltaE = 2 * dy;
+
+deltaNE = dy - dx;
+deltaNE = 2 * deltaNE;
+x = x0;
+y = y0;
+
+adresse = y * 640;
+adresse = adresse + 524288;
+adresse = adresse + x;
+ecrire_a (15, adresse);
+
+tant_que (x < x1)
+  si (dp > 0) 
+    dp = dp + deltaNE;
+    x = x + 1;
+    y = y + 1;
+  fin_si
+  si (dp < 0)
+    dp = dp + deltaE;
+    x = x + 1;
+  fin_si
+  si (dp == 0)
+    dp = dp + deltaE;
+    x = x + 1;
+  fin_si
+
+  adresse = y * 640;
+  adresse = adresse + 524288;
+  adresse = adresse + x;
+  ecrire_a (15, adresse);
+
+fin_tant_que
+

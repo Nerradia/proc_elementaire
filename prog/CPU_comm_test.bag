@@ -1,0 +1,9 @@
+entier a;
+entier b;
+
+tant_que ( 1 < 2 )
+  b = lire_a(524290);
+  ecrire_a(b, 8199);
+  a = lire_a(8200);
+  afficher_LCD(a);
+fin_tant_que;
