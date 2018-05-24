@@ -11,14 +11,14 @@ entity cpu_periph_manager is
     address_size : integer     -- Largeur de l'adresse
     );
   port (
-    cpu_bus_address : in std_logic_vector(address_size-1 downto 0);
-    cpu_bus_en      : in std_logic;
+    cpu_bus_address     : in std_logic_vector(address_size-1 downto 0);
+    cpu_bus_en          : in std_logic;
 
-    cpu_ram_en      : out std_logic;
-    cpu_shr_ram_en  : out std_logic;
-    spi_en          : out std_logic;
-    gpio_ctrl_en    : out std_logic;
-    sinus_table_en  : out std_logic
+    cpu_ram_en          : out std_logic;
+    cpu_shr_ram_en      : out std_logic;
+    spi_en              : out std_logic;
+    gpio_ctrl_en        : out std_logic;
+    cpu_sinus_table_en  : out std_logic
     );
 
 end entity cpu_periph_manager;
@@ -30,11 +30,11 @@ begin
 
   process (cpu_bus_address, cpu_bus_en) is
   begin
-    cpu_ram_en       <= '0';
-    cpu_shr_ram_en   <= '0';
-    spi_en           <= '0';
-    gpio_ctrl_en     <= '0';
-    sinus_table_en   <= '0';
+    cpu_ram_en           <= '0';
+    cpu_shr_ram_en       <= '0';
+    spi_en               <= '0';
+    gpio_ctrl_en         <= '0';
+    cpu_sinus_table_en   <= '0';
     
     if cpu_bus_en = '1' then
       case to_integer(unsigned(cpu_bus_address)) is
@@ -45,7 +45,7 @@ begin
           cpu_shr_ram_en   <= '1';
 
         when 16#03000# to 16#03fff# =>
-          sinus_table_en   <= '1';
+          cpu_sinus_table_en   <= '1';
 
         when 16#80000# =>
           spi_en       <= '1';

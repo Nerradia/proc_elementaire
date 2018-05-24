@@ -1,0 +1,48 @@
+entier valeur;
+entier i;
+entier j;
+entier adresse;
+adresse = 524304;
+entier led;
+entier deg;
+
+tant_que (1 < 2)
+  tant_que (i < 308)
+    tant_que (led < 16)
+      deg = led * 8;
+      deg = i + deg;
+
+      si (deg < 128)
+        valeur = 0;
+      fin_si;
+
+      si (deg > 127) 
+        deg = deg - 128;
+        valeur = sin(deg);
+      fin_si;
+
+      si (valeur > 256)
+        valeur = 0;
+      fin_si;
+
+      adresse = 524304 + led;
+      afficher_LCD (0);
+      ecrire_a (valeur, adresse);
+
+      led = led + 1;
+    
+    tant_que (j < 1000)
+      j = j + 1;
+    fin_tant_que;
+    j = 0;
+
+    fin_tant_que; // led < 16
+    led = 0;
+
+    i = i + 1;
+
+
+
+  fin_tant_que;
+  i = 0;
+fin_tant_que;

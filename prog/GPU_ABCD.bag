@@ -1,0 +1,101 @@
+entier base;
+entier adresse;
+base = 524288;
+
+tant_que (1 < 2)
+
+  // C1
+  adresse = 640 * 1;
+  adresse = adresse + 3;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+  // B2
+  adresse = 640 * 2;
+  adresse = adresse + 2;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+  // D2
+  adresse = 640 * 2;
+  adresse = adresse + 4;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+  // A3
+  adresse = 640 * 3;
+  adresse = adresse + 1;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+  // E3
+  adresse = 640 * 3;
+  adresse = adresse + 5;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  // E4
+  adresse = 640 * 4;
+  adresse = adresse + 5;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  // E5
+  adresse = 640 * 5;
+  adresse = adresse + 5;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  // E6
+  adresse = 640 * 6;
+  adresse = adresse + 5;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  // E7
+  adresse = 640 * 7;
+  adresse = adresse + 5;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+  // A4
+  adresse = 640 * 4;
+  adresse = adresse + 1;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+  // A5
+  adresse = 640 * 5;
+  adresse = adresse + 1;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+  // A6
+  adresse = 640 * 6;
+  adresse = adresse + 1;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+  // A7
+  adresse = 640 * 7;
+  adresse = adresse + 1;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+  // B5
+  adresse = 640 * 5;
+  adresse = adresse + 2;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+  // C5
+  adresse = 640 * 5;
+  adresse = adresse + 3;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  // D5
+  adresse = 640 * 5;
+  adresse = adresse + 4;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+
+
+
+  ecrire_a (1, 831488);
+fin_tant_que;

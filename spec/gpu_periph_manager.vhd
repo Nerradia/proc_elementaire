@@ -11,12 +11,13 @@ entity gpu_periph_manager is
     address_size : integer     -- Largeur de l'adresse
     );
   port (
-    gpu_bus_address : in std_logic_vector(address_size-1 downto 0);
-    gpu_bus_en      : in std_logic;
+    gpu_bus_address     : in std_logic_vector(address_size-1 downto 0);
+    gpu_bus_en          : in std_logic;
 
-    gpu_ram_en      : out std_logic;
-    gpu_shr_ram_en  : out std_logic;
-    vga_bitmap_en   : out std_logic
+    gpu_ram_en          : out std_logic;
+    gpu_shr_ram_en      : out std_logic;
+    gpu_sinus_table_en  : out std_logic;
+    vga_bitmap_en       : out std_logic
     );
 
 end entity gpu_periph_manager;
@@ -28,9 +29,10 @@ begin
 
   process (gpu_bus_address, gpu_bus_en) is
   begin
-    gpu_ram_en      <= '0';
-    gpu_shr_ram_en  <= '0';
-    vga_bitmap_en   <= '0';
+    gpu_ram_en         <= '0';
+    gpu_shr_ram_en     <= '0';
+    vga_bitmap_en      <= '0';
+    gpu_sinus_table_en <= '0';
     
     if gpu_bus_en = '1' then
       case to_integer(unsigned(gpu_bus_address)) is
@@ -39,6 +41,9 @@ begin
 
         when 16#02000# to 16#02fff# =>
           gpu_shr_ram_en <= '1';
+
+        when 16#03000# to 16#03fff# =>
+          gpu_sinus_table_en   <= '1';
 
         when 16#80000# to 16#cb000# =>
           vga_bitmap_en <= '1';

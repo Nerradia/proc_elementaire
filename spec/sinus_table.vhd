@@ -13,24 +13,37 @@ entity sinus_table is
   );
   port (
     clk                : in  std_logic;
-    
-    en                 : in  std_logic;
-    bus_data_in        : out std_logic_vector(data_size-1 downto 0);
-    bus_data_out       : in  std_logic_vector(data_size-1 downto 0);
-    bus_address        : in  std_logic_vector(address_size-1 downto 0);
-    bus_R_W            : in  std_logic;
-    bus_en             : in  std_logic
+
+    cpu_en             : in  std_logic;
+    cpu_bus_data_in    : out std_logic_vector(data_size-1 downto 0);
+    cpu_bus_data_out   : in  std_logic_vector(data_size-1 downto 0);
+    cpu_bus_address    : in  std_logic_vector(address_size-1 downto 0);
+    cpu_bus_R_W        : in  std_logic;
+    cpu_bus_en         : in  std_logic;
+
+    gpu_en             : in  std_logic;
+    gpu_bus_data_in    : out std_logic_vector(data_size-1 downto 0);
+    gpu_bus_data_out   : in  std_logic_vector(data_size-1 downto 0);
+    gpu_bus_address    : in  std_logic_vector(address_size-1 downto 0);
+    gpu_bus_R_W        : in  std_logic;
+    gpu_bus_en         : in  std_logic
   );
 end entity;
 
 architecture rtl of sinus_table is
 
+  constant rom_address_size : integer := 9;
+
   component rom_sin is
     Port ( 
-      clka  : in STD_LOGIC;
-      ena   : in STD_LOGIC;
-      addra : in STD_LOGIC_VECTOR ( 8 downto 0 );
-      douta : out STD_LOGIC_VECTOR ( 24 downto 0 )
+      clka    : in STD_LOGIC;
+      ena     : in STD_LOGIC;
+      addra   : in STD_LOGIC_VECTOR ( 8 downto 0 );
+      douta   : out STD_LOGIC_VECTOR ( 24 downto 0 );
+      clkb    : in STD_LOGIC;
+      enb     : in STD_LOGIC;
+      addrb   : in STD_LOGIC_VECTOR ( 8 downto 0 );
+      doutb   : out STD_LOGIC_VECTOR ( 24 downto 0 )
     );
   end component;
 
@@ -59,44 +72,80 @@ architecture rtl of sinus_table is
     );
 end component;
 
-  signal periph_data_in    : std_logic_vector(data_size-1 downto 0);
-  signal periph_data_out   : std_logic_vector(data_size-1 downto 0);
-  signal periph_address    : std_logic_vector(address_size-1 downto 0);
-  signal periph_R_W        : std_logic;
-  signal periph_en         : std_logic;
+  signal cpu_periph_data_in    : std_logic_vector(data_size-1 downto 0);
+  signal cpu_periph_data_out   : std_logic_vector(data_size-1 downto 0);
+  signal cpu_periph_address    : std_logic_vector(address_size-1 downto 0);
+  signal cpu_periph_R_W        : std_logic;
+  signal cpu_periph_en         : std_logic;
+
+  signal gpu_periph_data_in    : std_logic_vector(data_size-1 downto 0);
+  signal gpu_periph_data_out   : std_logic_vector(data_size-1 downto 0);
+  signal gpu_periph_address    : std_logic_vector(address_size-1 downto 0);
+  signal gpu_periph_R_W        : std_logic;
+  signal gpu_periph_en         : std_logic;
 
 begin
 
-inst_bus_interface : bus_periph_interface
+inst_cpu_bus_interface : bus_periph_interface
   generic map (
     address_size  => address_size,
     data_size     => data_size
   )
   port map (
-    en                => en,
+    en                => cpu_en,
 
-    periph_data_in    => periph_data_in,
-    periph_data_out   => periph_data_out,
+    periph_data_in    => cpu_periph_data_in,
+    periph_data_out   => cpu_periph_data_out,
 
-    bus_data_in       => bus_data_in,
-    bus_data_out      => bus_data_out,
+    bus_data_in       => cpu_bus_data_in,
+    bus_data_out      => cpu_bus_data_out,
 
-    periph_address    => periph_address,
-    bus_address       => bus_address,
+    periph_address    => cpu_periph_address,
+    bus_address       => cpu_bus_address,
 
-    bus_R_W           => bus_R_W,
-    periph_R_W        => periph_R_W,
+    bus_R_W           => cpu_bus_R_W,
+    periph_R_W        => cpu_periph_R_W,
 
-    bus_en            => bus_en,
-    periph_en         => periph_en
+    bus_en            => cpu_bus_en,
+    periph_en         => cpu_periph_en
+    );
+
+inst_gpu_bus_interface : bus_periph_interface
+  generic map (
+    address_size  => address_size,
+    data_size     => data_size
+  )
+  port map (
+    en                => gpu_en,
+
+    periph_data_in    => gpu_periph_data_in,
+    periph_data_out   => gpu_periph_data_out,
+
+    bus_data_in       => gpu_bus_data_in,
+    bus_data_out      => gpu_bus_data_out,
+
+    periph_address    => gpu_periph_address,
+    bus_address       => gpu_bus_address,
+
+    bus_R_W           => gpu_bus_R_W,
+    periph_R_W        => gpu_periph_R_W,
+
+    bus_en            => gpu_bus_en,
+    periph_en         => gpu_periph_en
     );
 
 inst_rom_sin : rom_sin
   port map ( 
-    clka     => clk,
-    ena      => periph_en,
-    addra    => periph_address(8 downto 0),
-    douta    => periph_data_out
+    clka      => clk,
+    ena       => cpu_en,
+    addra     => cpu_periph_address (rom_address_size-1 downto 0),
+    douta     => cpu_periph_data_out,
+    clkb      => clk,
+    enb       => gpu_en,
+    addrb     => gpu_periph_address (rom_address_size-1 downto 0),
+    doutb     => gpu_periph_data_out
   );
+
+
 
 end architecture;
