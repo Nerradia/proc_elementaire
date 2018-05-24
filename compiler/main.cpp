@@ -93,12 +93,24 @@ std::string ReplaceAll( std::string str,
 
 inline bool isInteger(const std::string & s)
 {
-   if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false ;
+  if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false ;
+  if(s.find(".") != std::string::npos) {
+    return false;
+  }
+  char * p ;
+  strtol(s.c_str(), &p, 10) ;
 
-   char * p ;
-   strtol(s.c_str(), &p, 10) ;
+  return (*p == 0) ;
+}
 
-   return (*p == 0) ;
+bool isReal (const std::string & s) {
+  if ( s.find(".") != std::string::npos ) {
+    std::string t1 = s;
+    t1 = ReplaceAll (t1, ".", "");
+    return isInteger(t1);
+  } else {
+    return false;
+  }
 }
 
 std::string find_name(std::string str) {
@@ -223,17 +235,6 @@ int loop_to_close (std::vector<instruction*> & ins_v) {
 }
 
 int loop_to_loop (std::vector<instruction*> & ins_v, int toClose) {
-  /*
-  for ( unsigned int i = ins_v.size() - 1; i > 0; i-- ) {
-    if(ins_v[i]->type == TANT_QUE)
-      if(! ins_v[i]->is_closed) {
-        printf("looping %d at address %d\n",ins_v[i]->num, ins_v[i]->address );
-        ins_v[i]->is_closed = true;
-        return ins_v[i]->address;
-      }
-  }
-  return 0;
-  */
   for ( unsigned int i = ins_v.size() - 1; i > 0; i-- ) {
     if(ins_v[i]->type == TANT_QUE)
       if(ins_v[i]->num == toClose) {
@@ -245,6 +246,27 @@ int loop_to_loop (std::vector<instruction*> & ins_v, int toClose) {
   return 0;
 }
 
+var variable ( std::string name, std::vector<var> &var_v ) {
+  var v;
+  v.name = name;
+  if ( isInteger(name) && ! is_declared(name, var_v)){
+    v.value = atol(v.name.c_str());
+    v.type = INTEGER;
+    var_v.push_back(v);
+    return v;
+  }
+  if ( isReal(v.name) && ! is_declared(v.name, var_v) ) {
+    v.value = atof(v.name.c_str())*256;
+    v.type = REAL;
+    var_v.push_back(v);
+    return v;
+  }
+  for (unsigned int i = 0; i < var_v.size(); ++i) {
+    if ( var_v[i].name == name )
+      return var_v[i];
+  }
+  return v;
+}
 
 int main(int argc, char const *argv[])
 {
@@ -290,22 +312,31 @@ int main(int argc, char const *argv[])
     // 0
     v.name = "0";
     v.value = 0;
+    v.type = INTEGER;
+    var_v.push_back(v);
+    v.name = "0.";
+    v.value = 0;
+    v.type = REAL;
     var_v.push_back(v);
     // 1
     v.name = "1";
     v.value = 1;
+    v.type = INTEGER;
     var_v.push_back(v);
     // 1
     v.name = "180";
     v.value = 0xB4;
+    v.type = INTEGER;
     var_v.push_back(v);
     // FF
     v.name = "FFFFFFF";
     v.value = 0xFFFFFFF;
+    v.type = INTEGER;
     var_v.push_back(v);
     // sine index
     v.name = "SININDEX";
     v.value = 0x0003000;
+    v.type = INTEGER;
     var_v.push_back(v);
     
     // sine index
@@ -337,72 +368,60 @@ int main(int argc, char const *argv[])
 
     } else if ( line.find("+")  != std::string::npos ) {
       ins = new addition;
+
       //first, find the variable to update
       v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
       ins->set_return_var( v );
-      //then find the 2 arguments
-      v.name = argument_addition_1(line);
 
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      //Argument 1
+      v.name = argument_addition_1 ( line );
+      v = variable( v.name, var_v );
       ins->set_argument1( v );
-      v.name = argument_addition_2(line);
 
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      //Argument 2
+      v.name = argument_addition_2(line);
+      v = variable( v.name, var_v );
       ins->set_argument2( v );
+
       ins_v.push_back(ins);
 
     } else if (    line.find("-")  != std::string::npos 
                 && line.find("=-") == std::string::npos) {
       ins = new soustraction;
-      //first, find the variable to update
+
       v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
       ins->set_return_var( v );
-      //then find the 2 arguments
+
+      //Argument 1
       v.name = argument_soustraction_1(line);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       ins->set_argument1( v );
+
+      //Argument 2
       v.name = argument_soustraction_2(line);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       ins->set_argument2( v );
+
       ins_v.push_back(ins);
     
     } else if ( line.find("*")  != std::string::npos) {
-      //TODO
+
       ins = new multiplication;
-      //first, find the variable to update
+
       v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
       ins->set_return_var( v );
-      //then find the 2 arguments
+
       v.name = argument_multiplication_1(line);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       ins->set_argument1( v );
+
       v.name = argument_multiplication_2(line);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       ins->set_argument2( v );
+
       ins_v.push_back(ins);
     
     } else if ( line.find("fin_si") != std::string::npos ) {
@@ -413,25 +432,19 @@ int main(int argc, char const *argv[])
 
     } else if (    line.find("si")  != std::string::npos 
                 && line.find("sin") == std::string::npos) {
+
       condition *cond = new condition;
       cond->set_condition_type ( condition_type (line) );
       cond->num = id_cond;
       conditions.push(id_cond);
       id_cond++;
+
       v.name = argument_condition1 (line, cond->condition_type);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       cond->set_argument1 ( v );
 
       v.name = argument_condition2 (line, cond->condition_type);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       cond->set_argument2( v );
 
       ins_v.push_back(cond);
@@ -440,152 +453,112 @@ int main(int argc, char const *argv[])
       sine *cond = new sine;
 
       v.name = argument_condition1(line,")");
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       cond->set_argument1 ( v );
-      //set the return variable
+
       v.name = variable_to_change(line);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       cond->set_return_var( v );
+
       ins_v.push_back(cond);
 
     } else if ( line.find("cos(")  != std::string::npos ) {
       cos *cond = new cos;
 
       v.name = argument_condition1(line,")");
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       cond->set_argument1 ( v );
       
-      //set the return variable
       v.name = variable_to_change(line);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       cond->set_return_var( v );
       
       ins_v.push_back(cond);
 
     } else if ( line.find("fin_tant_que")  != std::string::npos ) {
       ins = new endloop;
+
       ins->num = loops.top();
       loops.pop();
       ins_v.push_back(ins);
 
     } else if ( line.find("tant_que")  != std::string::npos ) {
       loop *lo = new loop;
+
       lo->set_condition_type ( condition_type (line) );
       lo->num = id_loop;
       loops.push(id_loop);
       id_loop++;
+
       v.name = argument_condition1 (line, lo->condition_type);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       lo->set_argument1 ( v );
 
       v.name = argument_condition2 (line, lo->condition_type);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       lo->set_argument2( v );
 
       ins_v.push_back(lo);
 
     } else if ( line.find("afficher_LCD")  != std::string::npos ) {
       ins = new disp_LCD;
-      //first, find the variable to update
+
       v.name = argument_condition1(line,")");
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       ins->set_argument1( v );
+
       ins_v.push_back(ins);
 
     } else if ( line.find("ecrire_mem_part")  != std::string::npos ) {
       ins = new write_to_shared;
-      //first, find the variable to update
+
       v.name = argument_condition1(line,",");
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       ins->set_argument1( v );
+
       v.name = argument_condition2(line,",");
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       ins->set_argument2( v );
+
       ins_v.push_back(ins);
 
     } else if ( line.find("ecrire_a")  != std::string::npos ) {
       ins = new write_at;
-      //first, find the variable to update
+
       v.name = argument_condition1(line,",");
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       ins->set_argument1( v );
+
       v.name = argument_condition2(line,",");
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       ins->set_argument2( v );
+
       ins_v.push_back(ins);
 
     } else if ( line.find("lire_a")  != std::string::npos ) {
       ins = new read_at;
-      //first, find the variable to update
+
       v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
       ins->set_return_var( v );
-      //then find the argument
+
       v.name = argument_condition1(line,")");
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
+      v = variable( v.name, var_v );
       ins->set_argument1( v );
+
       ins_v.push_back(ins);
+
     } else if ( line.find("=")  != std::string::npos ) {
       ins = new affectation;
-      //first, find the variable to update
+ 
       v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
       ins->set_return_var( v );
-      //then find the 2 arguments
+
       v.name = argument_affectation(line);
-      //we check if it's an undeclared constant
-      if(isInteger(v.name) && ! is_declared(v.name, var_v)){
-        v.value = atol(v.name.c_str());
-        var_v.push_back(v);
-      }
-      //printf("var : %s value :%x\n", v.name.c_str(), v.value );
+      v = variable( v.name, var_v );
       ins->set_argument1( v );
+
       ins_v.push_back(ins);
     } else {
       //printf("==> autre ? \n");
@@ -600,7 +573,7 @@ int main(int argc, char const *argv[])
     ins_v[i]->set_address(index_ram);
     whole_file += ins_v[i]->print_instruction();
     index_ram  += ins_v[i]->nb_ins;
-    
+
     if (ins_v[i]->type == FIN_CONDITION) {
       //we are in a condition
       char temp1[30] = "";
@@ -635,7 +608,7 @@ int main(int argc, char const *argv[])
 
   //gestion des variables
   for (unsigned int i = 0; i < var_v.size(); ++i) {
-    //printf("%d VAR %x //nom: %s\n", index_ram, var_v[i].value, var_v[i].name.c_str());
+    //printf("%d VAR %x //nom: %s // type %d\n", index_ram, var_v[i].value, var_v[i].name.c_str(), var_v[i].type);
     char temp[30];
     sprintf(temp, "VAR %07x\n", var_v[i].value & 0x1ffffff);
     whole_file += temp;

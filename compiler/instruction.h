@@ -44,7 +44,7 @@ public:
   uint32_t address;
   bool is_closed;
 
-protected:
+//protected:
   var a1;
   var a2;
   var a3;

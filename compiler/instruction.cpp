@@ -23,62 +23,82 @@ void instruction::set_address ( uint32_t address ) {
 }
 
 addition::addition() {
-  nb_ins = 4;
+  nb_ins = 3;
   type = ADDITION;
 }
 
 std::string addition::print_instruction() {
   std::string instructions = "";
-  instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name   + ")\n";
-  instructions += "ADD :addr(" + a2.name   + ")\n";
-  instructions += "STA :addr(" + var_.name + ")\n";
+  if(a1.type == INTEGER && a2.type == INTEGER) {
+    instructions += "GET :addr(" + a1.name   + ")\n";
+    instructions += "ADD :addr(" + a2.name   + ")\n";
+    instructions += "STA :addr(" + var_.name + ")\n";
+  } else if (a1.type == REAL && a2.type == REAL) {
+    instructions += "GET :addr(" + a1.name   + ")\n";
+    instructions += "FAD :addr(" + a2.name   + ")\n";
+    instructions += "STA :addr(" + var_.name + ")\n";
+  } else {
+    fprintf(stderr, "\033[1;31mYou can only add variable with the same type\033[0m\n");
+  }
   return instructions;
 }
 
 affectation::affectation() {
-  nb_ins = 3;
+  nb_ins = 2;
   type = AFFECTATION;
 }
 
 std::string affectation::print_instruction() {
   std::string instructions = "";
-  instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name   + ")\n";
+  instructions += "GET :addr(" + a1.name   + ")\n";
   instructions += "STA :addr(" + var_.name + ")\n";
   return instructions;
 }
 
 soustraction::soustraction() {
-  nb_ins = 4;
+  nb_ins = 3;
   type = SOUSTRACTION;
 }
 
 std::string soustraction::print_instruction() {
   std::string instructions = "";
-  instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name   + ")\n";
-  instructions += "SUB :addr(" + a2.name   + ")\n";
-  instructions += "STA :addr(" + var_.name + ")\n";
+  if(a1.type == INTEGER && a2.type == INTEGER) {
+    instructions += "GET :addr(" + a1.name   + ")\n";
+    instructions += "SUB :addr(" + a2.name   + ")\n";
+    instructions += "STA :addr(" + var_.name + ")\n";
+  } else if (a1.type == REAL && a2.type == REAL) {
+    instructions += "GET :addr(" + a1.name   + ")\n";
+    instructions += "SUB :addr(" + a2.name   + ")\n";
+    instructions += "STA :addr(" + var_.name + ")\n";
+  } else {
+    fprintf(stderr, "\033[1;31mYou can only substract variable with the same type\033[0m\n");
+  }
   return instructions;
 }
 
 multiplication::multiplication() {
-  nb_ins = 4;
+  nb_ins = 3;
   type = MULTIPLICATION;
 }
 
 std::string multiplication::print_instruction() {
   std::string instructions = "";
-  instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name   + ")\n";
-  instructions += "MUL :addr(" + a2.name   + ")\n";
-  instructions += "STA :addr(" + var_.name + ")\n";
+  if(a1.type == INTEGER && a2.type == INTEGER) {
+    instructions += "GET :addr(" + a1.name   + ")\n";
+    instructions += "MUL :addr(" + a2.name   + ")\n";
+    instructions += "STA :addr(" + var_.name + ")\n";
+  } else if (a1.type == REAL && a2.type == REAL) {
+    instructions += "GET :addr(" + a1.name   + ")\n";
+    instructions += "FMU :addr(" + a2.name   + ")\n";
+    instructions += "STA :addr(" + var_.name + ")\n";
+  } else {
+    fprintf(stderr, "\033[1;31mYou can only add variable with the same type\033[0m\n");
+  }
   return instructions;
 }
 
 condition::condition () {
-  nb_ins = 4;
+  nb_ins = 3;
   type = CONDITION;
 }
 
@@ -88,15 +108,14 @@ void condition::set_condition_type (std::string type) {
 
 std::string condition::print_instruction () {
   std::string instructions = "";
-  instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "GET :addr(" + a1.name + ")\n";
   if( condition_type == "<") {
     instructions += "TLT :addr(" + a2.name + ")\n";
   } else if( condition_type == ">") {
     instructions += "TGT :addr(" + a2.name + ")\n";
   } else if( condition_type ==  "==") {
     instructions += "TEQ :addr(" + a2.name + ")\n";
-  }
+  } 
   instructions += "JCC :condition(" + std::to_string(num) + ")\n";
   return instructions;
 }
@@ -112,7 +131,7 @@ std::string endif::print_instruction() {
 }
 
 loop::loop() {
-  nb_ins = 4;
+  nb_ins = 3;
   type = TANT_QUE;
 }
 
@@ -122,8 +141,7 @@ void loop::set_condition_type (std::string type) {
 
 std::string loop::print_instruction() {
   std::string instructions = "";
-  instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "GET :addr(" + a1.name + ")\n";
   if( condition_type == ">") {
     instructions += "TGT :addr(" + a2.name + ")\n";
   } else if( condition_type == "<") {
@@ -150,41 +168,38 @@ std::string endloop::print_instruction() {
 }
 
 disp_LCD::disp_LCD() {
-  nb_ins = 3;
+  nb_ins = 2;
   type = AFFICHAGE_LCD;
 }
 
 std::string disp_LCD::print_instruction() {
   std::string instructions = "";
-  instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "GET :addr(" + a1.name + ")\n";
   instructions += "STA 80001\n";
   return instructions;
 }
 
 write_to_shared::write_to_shared() {
-  nb_ins = 4;
+  nb_ins = 3;
   type = ECRITURE_MEMOIRE;
 }
 
 std::string write_to_shared::print_instruction() {
   std::string instructions = "";
-  instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "GET :addr(" + a1.name + ")\n";
   instructions += "ADD :addr(SHARED_INDEX)\n";
   instructions += "SAD :addr(" + a2.name + ")\n";
   return instructions;
 }
 
 sine::sine() {
-  nb_ins = 6;
+  nb_ins = 5;
   type = SIN;
 }
 
 std::string sine::print_instruction() {
   std::string instructions = "";
-  instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "GET :addr(" + a1.name + ")\n";
   instructions += "ADD :addr(SININDEX)\n";
   instructions += "STA :addr(DUMMY)\n";
   instructions += "GAD :addr(DUMMY)\n"; //get @ address
@@ -193,14 +208,13 @@ std::string sine::print_instruction() {
 }
 
 cos::cos() {
-  nb_ins = 7;
+  nb_ins = 6;
   type = COS;
 }
 
 std::string cos::print_instruction() {
   std::string instructions = "";
-  instructions += "NOR :addr(FFFFFFF)\n";
-  instructions += "ADD :addr(" + a1.name + ")\n";
+  instructions += "GET :addr(" + a1.name + ")\n";
   instructions += "ADD :addr(180)\n";
   instructions += "ADD :addr(SININDEX)\n";
   instructions += "STA :addr(DUMMY)\n";

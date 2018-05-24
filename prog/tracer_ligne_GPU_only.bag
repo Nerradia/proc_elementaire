@@ -24,9 +24,53 @@ fin_tant_que;
 ecrire_a (1, 831488);
 
 x0 = 10;
-y0 = 20;
-x1 = 300;
-y1 = 400;
+y0 = 200;
+x1 = 100;
+y1 = 200;
+
+dx = x1 - x0;
+dy = y1 - y0;
+dp = 2 * dy;
+dp = dp - dx;
+
+deltaE = 2 * dy;
+
+deltaNE = dy - dx;
+deltaNE = 2 * deltaNE;
+x = x0;
+y = y0;
+
+adresse = y * 640;
+adresse = adresse + 524288;
+adresse = adresse + x;
+ecrire_a (15, adresse);
+
+
+tant_que (x < x1)
+  si (dp > 0) 
+    dp = dp + deltaNE;
+    x = x + 1;
+    y = y + 1;
+  fin_si
+  si (dp < 0)
+    dp = dp + deltaE;
+    x = x + 1;
+  fin_si
+  si (dp == 0)
+    dp = dp + deltaE;
+    x = x + 1;
+  fin_si
+
+  adresse = y * 640;
+  adresse = adresse + 524288;
+  adresse = adresse + x;
+  ecrire_a (13, adresse);
+
+fin_tant_que
+x0 = 10;
+y0 = 300;
+x1 = 100;
+y1 = 200;
 
 dx = x1 - x0;
 dy = y1 - y0;
