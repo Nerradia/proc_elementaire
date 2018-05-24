@@ -409,7 +409,7 @@ int main(int argc, char const *argv[])
   while ( getline(in_f, line) ) {
     printf ( "%s\n", line.c_str() );
     line = ReplaceAll(line, " ", "");
-
+    if(line.length() < 2) break;
     if ( line.at(0) == '/' && line.at(1) == '/' ) {
       //to nothing, it's a comment
 
