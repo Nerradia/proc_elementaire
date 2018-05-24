@@ -26,7 +26,11 @@ typedef enum {
   SIN,
   COS,
   WRITE_AT,
-  READ_AT
+  READ_AT,
+  OR,
+  NOR,
+  AND,
+  XOR
 } INS_TYPE;
 
 
@@ -163,6 +167,34 @@ class read_at : public instruction {
 public:
   read_at();
   ~read_at();
+  std::string print_instruction();
+};
+
+class ins_or : public instruction {
+public:
+  ins_or();
+  ~ins_or();
+  std::string print_instruction();
+};
+
+class ins_nor : public instruction {
+public:
+  ins_nor();
+  ~ins_nor();
+  std::string print_instruction();
+};
+
+class ins_xor : public instruction {
+public:
+  ins_xor();
+  ~ins_xor();
+  std::string print_instruction();
+};
+
+class ins_and : public instruction {
+public:
+  ins_and();
+  ~ins_and();
   std::string print_instruction();
 };
 

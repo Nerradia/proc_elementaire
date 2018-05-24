@@ -174,6 +174,62 @@ std::string argument_multiplication_2 (std::string str) {
   return strNew;
 }
 
+std::string argument_ou_1 (std::string str) {
+  unsigned first = str.find("=") + 1;
+  unsigned last = str.find("|");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_ou_2 (std::string str) {
+  unsigned first = str.find("|") + 1;
+  unsigned last = str.find(";");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_et_1 (std::string str) {
+  unsigned first = str.find("=") + 1;
+  unsigned last = str.find("&");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_et_2 (std::string str) {
+  unsigned first = str.find("&") + 1;
+  unsigned last = str.find(";");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_xor_1 (std::string str) {
+  unsigned first = str.find("=") + 1;
+  unsigned last = str.find("^");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_xor_2 (std::string str) {
+  unsigned first = str.find("^") + 1;
+  unsigned last = str.find(";");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_nor_1 (std::string str) {
+  unsigned first = str.find("=") + 1;
+  unsigned last = str.find("~|");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+std::string argument_nor_2 (std::string str) {
+  unsigned first = str.find("~|") + 2;
+  unsigned last = str.find(";");
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
 std::string argument_affectation (std::string str) {
   unsigned first = str.find("=") + 1;
   unsigned last = str.find(";");
@@ -273,8 +329,8 @@ int main(int argc, char const *argv[])
   //opening of the files
   if(argc <= 1) {
     printf("You should use this program with the following arguments :\n");
-    printf("\t ./dtm input_file target_serial_port \n");
-    printf("\t example : ./compile input_file.bag outputfile.asm \n");
+    printf("\t ./compiler input_file target_serial_port \n");
+    printf("\t example : ./compiler input_file.bag outputfile.asm \n");
     return -1;
   } 
 
@@ -354,7 +410,10 @@ int main(int argc, char const *argv[])
     printf ( "%s\n", line.c_str() );
     line = ReplaceAll(line, " ", "");
 
-    if ( line.find("entier")    != std::string::npos ) {
+    if ( line.at(0) == '/' && line.at(1) == '/' ) {
+      //to nothing, it's a comment
+
+    } else if ( line.find("entier")    != std::string::npos ) {
       v.name = find_name(line);
       v.type = INTEGER;
       v.value = 0;
@@ -381,6 +440,86 @@ int main(int argc, char const *argv[])
 
       //Argument 2
       v.name = argument_addition_2(line);
+      v = variable( v.name, var_v );
+      ins->set_argument2( v );
+
+      ins_v.push_back(ins);
+
+    } else if ( line.find("|")  != std::string::npos ) {
+      ins = new ins_or;
+
+      //first, find the variable to update
+      v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
+      ins->set_return_var( v );
+
+      //Argument 1
+      v.name = argument_ou_1 ( line );
+      v = variable( v.name, var_v );
+      ins->set_argument1( v );
+
+      //Argument 2
+      v.name = argument_ou_2 ( line );
+      v = variable( v.name, var_v );
+      ins->set_argument2( v );
+
+      ins_v.push_back(ins);
+
+    }  else if ( line.find("&")  != std::string::npos ) {
+      ins = new ins_and;
+
+      //first, find the variable to update
+      v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
+      ins->set_return_var( v );
+
+      //Argument 1
+      v.name = argument_et_1 ( line );
+      v = variable( v.name, var_v );
+      ins->set_argument1( v );
+
+      //Argument 2
+      v.name = argument_et_2 ( line );
+      v = variable( v.name, var_v );
+      ins->set_argument2( v );
+
+      ins_v.push_back(ins);
+
+    } else if ( line.find("^")  != std::string::npos ) {
+      ins = new ins_xor;
+
+      //first, find the variable to update
+      v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
+      ins->set_return_var( v );
+
+      //Argument 1
+      v.name = argument_xor_1 ( line );
+      v = variable( v.name, var_v );
+      ins->set_argument1( v );
+
+      //Argument 2
+      v.name = argument_xor_2 ( line );
+      v = variable( v.name, var_v );
+      ins->set_argument2( v );
+
+      ins_v.push_back(ins);
+
+    } else if ( line.find("~|")  != std::string::npos ) {
+      ins = new ins_nor;
+
+      //first, find the variable to update
+      v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
+      ins->set_return_var( v );
+
+      //Argument 1
+      v.name = argument_nor_1 ( line );
+      v = variable( v.name, var_v );
+      ins->set_argument1( v );
+
+      //Argument 2
+      v.name = argument_nor_2 ( line );
       v = variable( v.name, var_v );
       ins->set_argument2( v );
 

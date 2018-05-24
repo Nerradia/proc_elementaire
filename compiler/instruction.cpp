@@ -247,4 +247,56 @@ std::string read_at::print_instruction() {
   return instructions;
 }
 
+ins_or::ins_or() {
+  nb_ins = 3;
+  type = OR;
+}
+
+std::string ins_or::print_instruction() {
+  std::string instructions = "";
+  instructions += "GET :addr(" + a1.name   + ")\n";
+  instructions += "LOR :addr(" + a2.name   + ")\n";
+  instructions += "STA :addr(" + var_.name + ")\n";
+  return instructions;
+}
+
+ins_nor::ins_nor() {
+  nb_ins = 3;
+  type = OR;
+}
+
+std::string ins_nor::print_instruction() {
+  std::string instructions = "";
+  instructions += "GET :addr(" + a1.name   + ")\n";
+  instructions += "NOR :addr(" + a2.name   + ")\n";
+  instructions += "STA :addr(" + var_.name + ")\n";
+  return instructions;
+}
+
+ins_xor::ins_xor() {
+  nb_ins = 3;
+  type = OR;
+}
+
+std::string ins_xor::print_instruction() {
+  std::string instructions = "";
+  instructions += "GET :addr(" + a1.name   + ")\n";
+  instructions += "XOR :addr(" + a2.name   + ")\n";
+  instructions += "STA :addr(" + var_.name + ")\n";
+  return instructions;
+}
+
+ins_and::ins_and() {
+  nb_ins = 3;
+  type = OR;
+}
+
+std::string ins_and::print_instruction() {
+  std::string instructions = "";
+  instructions += "GET :addr(" + a1.name   + ")\n";
+  instructions += "AND :addr(" + a2.name   + ")\n";
+  instructions += "STA :addr(" + var_.name + ")\n";
+  return instructions;
+}
+
 
