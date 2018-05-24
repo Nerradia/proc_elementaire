@@ -300,3 +300,28 @@ std::string ins_and::print_instruction() {
 }
 
 
+ins_fti::ins_fti() {
+  nb_ins = 2;
+  type = FTI;
+}
+
+std::string ins_fti::print_instruction() {
+  std::string instructions = "";
+  instructions += "FTI :addr(" + a1.name   + ")\n";
+  instructions += "STA :addr(" + var_.name + ")\n";
+  return instructions;
+}
+
+ins_itf::ins_itf() {
+  nb_ins = 2;
+  type = ITF;
+}
+
+std::string ins_itf::print_instruction() {
+  std::string instructions = "";
+  instructions += "ITF :addr(" + a1.name   + ")\n";
+  instructions += "STA :addr(" + var_.name + ")\n";
+  return instructions;
+}
+
+

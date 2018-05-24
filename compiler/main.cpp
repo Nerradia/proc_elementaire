@@ -445,6 +445,35 @@ int main(int argc, char const *argv[])
 
       ins_v.push_back(ins);
 
+    } else if ( line.find("rve")  != std::string::npos ) { //real to int
+      ins = new ins_fti;
+
+      v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
+      ins->set_return_var( v );
+
+      //Argument 1
+      v.name = argument_condition1 ( line, ")" );
+      v = variable( v.name, var_v );
+      ins->set_argument1( v );
+
+      ins_v.push_back(ins);
+
+    } else if ( line.find("evr")  != std::string::npos ) { //int to real
+      ins = new ins_itf;
+
+      //first, find the variable to update
+      v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
+      ins->set_return_var( v );
+
+      //Argument 1
+      v.name = argument_condition1 ( line, ")" );
+      v = variable( v.name, var_v );
+      ins->set_argument1( v );
+
+      ins_v.push_back(ins);
+
     } else if ( line.find("|")  != std::string::npos ) {
       ins = new ins_or;
 

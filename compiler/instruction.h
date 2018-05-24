@@ -30,7 +30,9 @@ typedef enum {
   OR,
   NOR,
   AND,
-  XOR
+  XOR,
+  FTI,
+  ITF
 } INS_TYPE;
 
 
@@ -195,6 +197,20 @@ class ins_and : public instruction {
 public:
   ins_and();
   ~ins_and();
+  std::string print_instruction();
+};
+
+class ins_fti : public instruction {
+public:
+  ins_fti();
+  ~ins_fti();
+  std::string print_instruction();
+};
+
+class ins_itf : public instruction {
+public:
+  ins_itf();
+  ~ins_itf();
   std::string print_instruction();
 };
 
