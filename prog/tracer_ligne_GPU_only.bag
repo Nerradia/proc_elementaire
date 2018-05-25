@@ -18,15 +18,15 @@ entier valid;
 
 adresse = 524288;
 tant_que(adresse < 831487)
-  ecrire_a (15, adresse);
+  ecrire_a (0, adresse);
   adresse = adresse + 1;
 fin_tant_que;
-ecrire_a (1, 831488);
+ecrire_a (0, 831488);
 
-x0 = 10;
-y0 = 200;
-x1 = 100;
-y1 = 200;
+x0 = 0;
+y0 = 0;
+x1 = 600;
+y1 = 400;
 
 dx = x1 - x0;
 dy = y1 - y0;
@@ -43,7 +43,7 @@ y = y0;
 adresse = y * 640;
 adresse = adresse + 524288;
 adresse = adresse + x;
-ecrire_a (15, adresse);
+ecrire_a (0, adresse);
 
 
 tant_que (x < x1)
@@ -64,7 +64,7 @@ tant_que (x < x1)
   adresse = y * 640;
   adresse = adresse + 524288;
   adresse = adresse + x;
-  ecrire_a (13, adresse);
+  ecrire_a (15, adresse);
 
 fin_tant_que
 x0 = 10;

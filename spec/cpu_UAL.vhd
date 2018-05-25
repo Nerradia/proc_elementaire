@@ -86,6 +86,7 @@ begin
     data_out_with_carry <= (others => '0');
     data_A_fixed        := (others => '0'); 
     data_B_fixed        := (others => '0'); 
+    data_out_fixed      := (others => '0');
 
     case sel_ual is
 
@@ -104,16 +105,16 @@ begin
 
       -- Instructions mathématiques sur entiers
       when "00100"  =>
-        data_out_with_carry (data_size     downto 0)   <= std_logic_vector(unsigned("0" & data_A) + unsigned("0" & data_B));
+        data_out_with_carry (data_size     downto 0)   <= std_logic_vector(signed("0" & data_A) + signed("0" & data_B));
 
       when "00101" =>
-        data_out_with_carry (data_size-1   downto 0)   <= std_logic_vector(unsigned(data_B) - unsigned(data_A));
+        data_out_with_carry (data_size-1   downto 0)   <= std_logic_vector(signed(data_B) - signed(data_A));
 
       when "00110"  =>
-        data_out_with_carry (6             downto 0)   <= std_logic_vector(unsigned(data_B(6 downto 0)) / unsigned(data_A(3 downto 0)));
+        data_out_with_carry (6             downto 0)   <= std_logic_vector(signed(data_B(6 downto 0)) / signed(data_A(3 downto 0)));
 
       when "00111"  =>
-        data_out_with_carry (31            downto 0)   <= std_logic_vector(unsigned(data_B(15 downto 0)) * unsigned(data_A(15 downto 0)));
+        data_out_with_carry (31            downto 0)   <= std_logic_vector(signed(data_B(15 downto 0)) * signed(data_A(15 downto 0)));
 
   -- Instructions mathématiques sur virgules fixes
   -- OP_ADDF
@@ -149,7 +150,7 @@ begin
   -- OP_FTOI
       when "01100" =>
         -- Tronquage de la partie entière (l'idéal serait un arrondi mais bon...)
-        data_out_with_carry(sfixed_msb downto 0) <= std_logic_vector(data_A_fixed(sfixed_msb downto 0)); 
+        data_out_with_carry(sfixed_msb downto 0) <= data_A(8+10 downto 8); 
 
   -- OP_ITOF
       when "01101" =>
@@ -177,15 +178,15 @@ begin
   -- Tests sur les entiers et les virgules fixes
   -- OP_TGT
       when "10100" =>
-        data_out_with_carry(data_size) <= '1' when unsigned(data_A) < unsigned (data_B) else '0';
+        data_out_with_carry(data_size) <= '1' when signed(data_A) < signed (data_B) else '0';
 
   -- OP_TLT
       when "10101" =>
-        data_out_with_carry(data_size) <= '1' when unsigned(data_A) > unsigned (data_B) else '0';
+        data_out_with_carry(data_size) <= '1' when signed(data_A) > signed (data_B) else '0';
 
   -- OP_TEQ
       when "10110" =>
-        data_out_with_carry(data_size) <= '1' when unsigned(data_A) = unsigned (data_B) else '0';
+        data_out_with_carry(data_size) <= '1' when signed(data_A) = signed (data_B) else '0';
 
 
       when others =>

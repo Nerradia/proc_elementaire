@@ -1,0 +1,22 @@
+entier i;
+entier adresse;
+entier j;
+adresse = 8192;
+entier valeur;
+
+tant_que (1 < 2)
+  i = i + 1;
+  valeur = sin(i);
+  si (i > 180)
+    i = 0;
+  fin_si;
+
+  ecrire_a (valeur, adresse);
+  afficher_LCD(i);
+
+  tant_que (j < 100000)
+    j = j + 1;
+  fin_tant_que;
+  j = 0;
+
+fin_tant_que;

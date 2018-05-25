@@ -237,8 +237,8 @@ architecture rtl of FSM is
           or op_code = "00101" -- OP_SUB
           or op_code = "00110" -- OP_DIV
           or op_code = "00111" -- OP_MUL
-          or op_code = "10100" -- OP_FTOI
-          or op_code = "10101" -- OP_ITOF
+          or op_code = "01100" -- OP_FTOI
+          or op_code = "01101" -- OP_ITOF
           or op_code = "10100" -- OP_TGT
           or op_code = "10101" -- OP_TLT
           or op_code = "10110" -- OP_TEQ

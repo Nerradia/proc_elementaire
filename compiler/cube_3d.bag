@@ -1,261 +1,276 @@
-entier a; //rot y
-entier b; //rot x
-entier c; //rot z
-entier decalage_x; // taille de l'écran en x : 640 pixels
-entier decalage_y; // taille de l'écran en y : 480 pixels
-
-reel x1_o; //point 1 original
+entier a; 
+entier b; 
+entier c; 
+reel decalage_x; 
+reel decalage_y; 
+reel x1_o; 
 reel y1_o;
 reel z1_o;
-reel x2_o; //point 2
+reel x2_o; 
 reel y2_o;
 reel z2_o;
-reel x3_o; //point 3
+reel x3_o; 
 reel y3_o;
 reel z3_o;
-reel x4_o; //point 4
+reel x4_o; 
 reel y4_o;
 reel z4_o;
-reel x5_o; //point 5
+reel x5_o; 
 reel y5_o;
 reel z5_o;
-reel x6_o; //point 6
+reel x6_o; 
 reel y6_o;
 reel z6_o;
-reel x7_o; //point 7
+reel x7_o; 
 reel y7_o;
 reel z7_o;
-reel x8_o; //point 8
+reel x8_o; 
 reel y8_o;
 reel z8_o;
-
-reel x1; //point 1 après transformation
+reel x1; 
 reel y1;
-reel x2; //point 2
+reel x2; 
 reel y2;
-reel x3; //point 3
+reel x3; 
 reel y3;
-reel x4; //point 4
+reel x4; 
 reel y4;
-reel x5; //point 5
+reel x5; 
 reel y5;
-reel x6; //point 6
+reel x6; 
 reel y6;
-reel x7; //point 7
+reel x7; 
 reel y7;
-reel x8; //point 8
+reel x8; 
 reel y8;
-
-reel xx; //variables pour la transformation dans l'espace 
+reel xx; 
 reel xy;
 reel yx;
 reel yy;
 reel zx;
 reel zy;
-
 reel temp1;
 reel temp2;
 reel temp3;
-
-reel sa; //sin(a)
-reel sb; //sin(b)
-reel sc; //sin(c)
-reel ca; //cos(a)
-reel cb; //cos(b)
-reel cc; //cos(c)
-
-x1_o = 1; //affectation des points originaux
-x2_o = 1;
-x3_o = -1;
-x4_o = -1;
-x5_o = 1;
-x6_o = 1;
-x7_o = -1;
-x8_o = -1;
-y1_o = 1;
-y2_o = 1;
-y3_o = 1;
-y4_o = 1;
-y5_o = -1;
-y6_o = -1;
-y7_o = -1;
-y8_o = -1;
-z1_o = -1;
-z2_o = 1;
-z3_o = 1;
-z4_o = -1;
-z5_o = -1;
-z6_o = 1;
-z7_o = 1;
-z8_o = -1;
-
-a = 0;
-b = 0;
-c = 0;
-
-decalage_x = 320; // taille de l'écran en x : 640 pixels
-decalage_y = 240; // taille de l'écran en y : 480 pixels
-
-sa = sin(a); //calcul des valeurs compliquées 
-sb = sin(b); //  et stockage dans la ram
-sc = sin(c);
-ca = cos(a);
-cb = cos(b);
-cc = cos(c);
-
-xx    = cc * ca;    //transf. xx: (cos(c)cos(a)-sin(c)sin(a)sin(b))
-temp1 = sc * sa;
-temp1 = temp1 * sb;
-xx    = xx - temp1;
-
-temp1 = cc * sa; //transf. xy: (cos(c)sin(a)sin(b)+sin(c)cos(a))
-xy    = temp1 * sb;
-temp1 = sc * ca;
-xy    = xy + temp1; 
-
-temp1 = sa * cc; //transf. yx: (-cos(c)sin(a)-sin(c)cos(a)sin(b))
-yx    = 0 - temp1; //inversion
-temp1 = sc * ca;
-temp1 = sc * sb;
-yx    = yx - temp1;
-
-temp1 = cc * ca; //transf. yy: (cos(c)cos(a)sin(b)-sin(c)sin(a))
-yy    = temp1 * sb;
-temp1 = sc * sa;
-yy    = yy - temp1; 
-
-zx    = sc * cb;    //transf. zx: (-sin(c)cos(b))
-zx    = 0 - zx;
-
-zy    = cc * cb;    //transf. zy: (cos(c)cos(b)^2)
-zy    = zy * cb;
-
-x1    = x1_o * xx; //transformation des points pour affichage
-temp1 = y1_o * yx;
-x1    = x1 + temp1;
-temp1 = z1_o * zx;
-x1    = x1 + temp1;
-
-y1    = x1_o * xy;
-temp1 = y1_o * yy;
-y1    = y1 + temp1;
-temp1 = z1_o * zy;
-y1    = y1 + temp1;
-
-x2    = x2_o * xx; 
-temp1 = y2_o * yx;
-x2    = x2 + temp1;
-temp1 = z2_o * zx;
-x2    = x2 + temp1;
-
-y2    = x2_o * xy;
-temp1 = y2_o * yy;
-y2    = y2 + temp1;
-temp1 = z2_o * zy;
-y2    = y2 + temp1;
-
-x3    = x3_o * xx; 
-temp1 = y3_o * yx;
-x3    = x3 + temp1;
-temp1 = z3_o * zx;
-x3    = x3 + temp1;
-
-y3    = x3_o * xy;
-temp1 = y3_o * yy;
-y3    = y3 + temp1;
-temp1 = z3_o * zy;
-y3    = y3 + temp1;
-
-x4    = x4_o * xx; 
-temp1 = y4_o * yx;
-x4    = x4 + temp1;
-temp1 = z4_o * zx;
-x4    = x4 + temp1;
-
-y4    = x4_o * xy;
-temp1 = y4_o * yy;
-y4    = y4 + temp1;
-temp1 = z4_o * zy;
-y4    = y4 + temp1;
-
-x5    = x5_o * xx; 
-temp1 = y5_o * yx;
-x5    = x5 + temp1;
-temp1 = z5_o * zx;
-x5    = x5 + temp1;
-
-y5    = x5_o * xy;
-temp1 = y5_o * yy;
-y5    = y5 + temp1;
-temp1 = z5_o * zy;
-y5    = y5 + temp1;
-
-x6    = x6_o * xx; 
-temp1 = y6_o * yx;
-x6    = x6 + temp1;
-temp1 = z6_o * zx;
-x6    = x6 + temp1;
-
-y6    = x6_o * xy;
-temp1 = y6_o * yy;
-y6    = y6 + temp1;
-temp1 = z6_o * zy;
-y6    = y6 + temp1;
-
-x7    = x7_o * xx; 
-temp1 = y7_o * yx;
-x7    = x7 + temp1;
-temp1 = z7_o * zx;
-x7    = x7 + temp1;
-
-y7    = x7_o * xy;
-temp1 = y7_o * yy;
-y7    = y7 + temp1;
-temp1 = z7_o * zy;
-y7    = y7 + temp1;
-
-x8    = x8_o * xx; 
-temp1 = y8_o * yx;
-x8    = x8 + temp1;
-temp1 = z8_o * zx;
-x8    = x8 + temp1;
-
-y8    = x8_o * xy;
-temp1 = y8_o * yy;
-y8    = y8 + temp1;
-temp1 = z8_o * zy;
-y8    = y8 + temp1;
-
-x1 = x1 + decalage_x; // décalage du cube vers le milieu de l'écran
-y1 = y1 + decalage_y;
-x2 = x2 + decalage_x;
-y2 = y2 + decalage_y;
-x3 = x3 + decalage_x;
-y3 = y3 + decalage_y;
-x4 = x4 + decalage_x;
-y4 = y4 + decalage_y;
-x5 = x5 + decalage_x;
-y5 = y5 + decalage_y;
-x6 = x6 + decalage_x;
-y6 = y6 + decalage_y;
-x7 = x7 + decalage_x;
-y7 = y7 + decalage_y;
-x8 = x8 + decalage_x;
-y8 = y8 + decalage_y;
-
-vers_ecran(1,  x1);
-vers_ecran(2,  y1);
-vers_ecran(3,  x2);
-vers_ecran(4,  y2);
-vers_ecran(5,  x3);
-vers_ecran(6,  y3);
-vers_ecran(7,  x4);
-vers_ecran(8,  y4);
-vers_ecran(9,  x5);
-vers_ecran(10, y5);
-vers_ecran(11, x6);
-vers_ecran(12, y6);
-vers_ecran(13, x7);
-vers_ecran(14, y7);
-vers_ecran(15, x8);
-vers_ecran(16, y8);
+reel sa; 
+reel sb; 
+reel sc; 
+reel ca; 
+reel cb; 
+reel cc; 
+entier tempconv;
+entier retour;
+entier base;
+entier adresse;
+base = 524288;
+retour = 1;
+x1_o = 1.; 
+x2_o = 1.;
+x3_o = -1.;
+x4_o = -1.;
+x5_o = 1.;
+x6_o = 1.;
+x7_o = -1.;
+x8_o = -1.;
+y1_o = 1.;
+y2_o = 1.;
+y3_o = 1.;
+y4_o = 1.;
+y5_o = -1.;
+y6_o = -1.;
+y7_o = -1.;
+y8_o = -1.;
+z1_o = -1.;
+z2_o = 1.;
+z3_o = 1.;
+z4_o = -1.;
+z5_o = -1.;
+z6_o = 1.;
+z7_o = 1.;
+z8_o = -1.;
+tant_que(1 < 2)
+  tant_que(retour > 0)
+    retour = lire_a(831488);
+  fin_tant_que;
+  a = a + 1;
+  si (a > 180)
+    a = 0;
+  fin_si;
+  b = 0;
+  c = 0;
+  decalage_x = 320.; 
+  decalage_y = 240.; 
+  sa = sin(a); 
+  sb = sin(b); 
+  sc = sin(c);
+  ca = cos(a);
+  cb = cos(b);
+  cc = cos(c);
+  tempconv = rve(sa);
+  afficher_LCD(tempconv);
+  xx    = cc * ca;    
+  temp1 = sc * sa;
+  temp1 = temp1 * sb;
+  xx    = xx - temp1;
+  temp1 = cc * sa; 
+  xy    = temp1 * sb;
+  temp1 = sc * ca;
+  xy    = xy + temp1; 
+  temp1 = sa * cc; 
+  yx    = 0. - temp1; 
+  temp1 = sc * ca;
+  temp1 = sc * sb;
+  yx    = yx - temp1;
+  temp1 = cc * ca; 
+  yy    = temp1 * sb;
+  temp1 = sc * sa;
+  yy    = yy - temp1; 
+  zx    = sc * cb;    
+  zx    = 0. - zx;
+  zy    = cc * cb;    
+  zy    = zy * cb;
+  x1    = x1_o * xx; 
+  temp1 = y1_o * yx;
+  x1    = x1 + temp1;
+  temp1 = z1_o * zx;
+  x1    = x1 + temp1;
+  y1    = x1_o * xy;
+  temp1 = y1_o * yy;
+  y1    = y1 + temp1;
+  temp1 = z1_o * zy;
+  y1    = y1 + temp1;
+  x2    = x2_o * xx; 
+  temp1 = y2_o * yx;
+  x2    = x2 + temp1;
+  temp1 = z2_o * zx;
+  x2    = x2 + temp1;
+  y2    = x2_o * xy;
+  temp1 = y2_o * yy;
+  y2    = y2 + temp1;
+  temp1 = z2_o * zy;
+  y2    = y2 + temp1;
+  x3    = x3_o * xx; 
+  temp1 = y3_o * yx;
+  x3    = x3 + temp1;
+  temp1 = z3_o * zx;
+  x3    = x3 + temp1;
+  y3    = x3_o * xy;
+  temp1 = y3_o * yy;
+  y3    = y3 + temp1;
+  temp1 = z3_o * zy;
+  y3    = y3 + temp1;
+  x4    = x4_o * xx; 
+  temp1 = y4_o * yx;
+  x4    = x4 + temp1;
+  temp1 = z4_o * zx;
+  x4    = x4 + temp1;
+  y4    = x4_o * xy;
+  temp1 = y4_o * yy;
+  y4    = y4 + temp1;
+  temp1 = z4_o * zy;
+  y4    = y4 + temp1;
+  x5    = x5_o * xx; 
+  temp1 = y5_o * yx;
+  x5    = x5 + temp1;
+  temp1 = z5_o * zx;
+  x5    = x5 + temp1;
+  y5    = x5_o * xy;
+  temp1 = y5_o * yy;
+  y5    = y5 + temp1;
+  temp1 = z5_o * zy;
+  y5    = y5 + temp1;
+  x6    = x6_o * xx;
+  temp1 = y6_o * yx;
+  x6    = x6 + temp1;
+  temp1 = z6_o * zx;
+  x6    = x6 + temp1;
+  y6    = x6_o * xy;
+  temp1 = y6_o * yy;
+  y6    = y6 + temp1;
+  temp1 = z6_o * zy;
+  y6    = y6 + temp1;
+  x7    = x7_o * xx; 
+  temp1 = y7_o * yx;
+  x7    = x7 + temp1;
+  temp1 = z7_o * zx;
+  x7    = x7 + temp1;
+  y7    = x7_o * xy;
+  temp1 = y7_o * yy;
+  y7    = y7 + temp1;
+  temp1 = z7_o * zy;
+  y7    = y7 + temp1;
+  x8    = x8_o * xx; 
+  temp1 = y8_o * yx;
+  x8    = x8 + temp1;
+  temp1 = z8_o * zx;
+  x8    = x8 + temp1;
+  y8    = x8_o * xy;
+  temp1 = y8_o * yy;
+  y8    = y8 + temp1;
+  temp1 = z8_o * zy;
+  y8    = y8 + temp1;
+  x1 = x1 + decalage_x; 
+  y1 = y1 + decalage_y;
+  x2 = x2 + decalage_x;
+  y2 = y2 + decalage_y;
+  x3 = x3 + decalage_x;
+  y3 = y3 + decalage_y;
+  x4 = x4 + decalage_x;
+  y4 = y4 + decalage_y;
+  x5 = x5 + decalage_x;
+  y5 = y5 + decalage_y;
+  x6 = x6 + decalage_x;
+  y6 = y6 + decalage_y;
+  x7 = x7 + decalage_x;
+  y7 = y7 + decalage_y;
+  x8 = x8 + decalage_x;
+  y8 = y8 + decalage_y;
+  adresse = 640 * tempconv;
+  tempconv = rve(x1);
+  adresse = adresse + tempconv;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  tempconv = rve(y2);
+  adresse = 640 * tempconv;
+  tempconv = rve (x2);
+  adresse = adresse + tempconv;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  tempconv = rve(y3);
+  adresse = 640 * tempconv;
+  tempconv = rve (x3);
+  adresse = adresse + tempconv;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  tempconv = rve(y4);
+  adresse = 640 * tempconv;
+  tempconv = rve (x4);
+  adresse = adresse + tempconv;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  tempconv = rve(y5);
+  adresse = 640 * tempconv;
+  tempconv = rve (x5);
+  adresse = adresse + tempconv;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  tempconv = rve(y6);
+  adresse = 640 * tempconv;
+  tempconv = rve (x6);
+  adresse = adresse + tempconv;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  tempconv = rve(y7);
+  adresse = 640 * tempconv;
+  tempconv = rve (x7);
+  adresse = adresse + tempconv;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  tempconv = rve(y8);
+  adresse = 640 * tempconv;
+  tempconv = rve (x8);
+  adresse = adresse + tempconv;
+  adresse = adresse + base;
+  ecrire_a (15, adresse);
+  ecrire_a(1, 831488);
+fin_tant_que;

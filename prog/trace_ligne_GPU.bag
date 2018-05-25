@@ -1,0 +1,127 @@
+entier x0;
+entier y0;
+entier x1;
+entier y1;
+entier dx;
+entier dy;
+entier dp;
+entier deltaE;
+entier deltaNE;
+entier x;
+entier y;
+entier adresse;
+entier adresse_2;
+entier valid;
+
+entier retour;
+
+entier diffxabs;
+entier diffyabs;
+entier tempx;
+entier tempy;
+
+tant_que(1 < 2)
+
+
+  retour = 1;
+  tant_que(retour > 0)
+    retour = lire_a(831488);
+  fin_tant_que;
+
+
+  adresse = 524288;              Vidage de l'écran
+  tant_que(adresse < 831487)
+    ecrire_a (0, adresse);
+    adresse = adresse + 1;
+  fin_tant_que;
+  ecrire_a (0, 831488);
+
+  x0 = lire_a (8192);
+  y0 = 0;
+  x1 = 600;
+  y1 = 400;
+
+  si (y1 > y0)
+    diffyabs = y1 - y0;
+  fin_si;
+
+  si (y1 < y0)
+    diffyabs = y0 - y1;
+  fin_si;
+
+  si (x1 > x0)
+    diffxabs = x1 - x0;
+  fin_si;
+
+  si (x1 < x0)
+    diffxabs = x0 - x1;
+  fin_si;
+
+  si (diffyabs < diffxabs)
+    si (x0 > x1)
+      tempx = x0;
+      tempy = y0;
+      x0 = x1;
+      y0 = y1;
+      x1 = tempx;
+      y1 = tempy;
+    fin_si
+  fin_si
+
+  si (diffyabs > diffxabs)
+    si (y0 > y1)
+      si (y0 > y1)
+        tempx = x0;
+        tempy = y0;
+        x0 = x1;
+        y0 = y1;
+        x1 = tempx;
+        y1 = tempy;
+      fin_si
+    fin_si
+  fin_si
+
+
+  dx = x1 - x0;                 
+  dy = y1 - y0;
+  dp = 2 * dy;
+  dp = dp - dx;
+
+  deltaE = 2 * dy;
+
+  deltaNE = dy - dx;
+  deltaNE = 2 * deltaNE;
+  x = x0;
+  y = y0;
+
+  adresse = y * 640;
+  adresse = adresse + 524288;
+  adresse = adresse + x;
+  ecrire_a (0, adresse);
+
+
+  tant_que (x < x1)
+    si (dp > 0) 
+      dp = dp + deltaNE;
+      x = x + 1;
+      y = y + 1;
+    fin_si
+    si (dp < 0)
+      dp = dp + deltaE;
+      x = x + 1;
+    fin_si
+    si (dp == 0)
+      dp = dp + deltaE;
+      x = x + 1;
+    fin_si
+
+    adresse = y * 640;
+    adresse = adresse + 524288;
+    adresse = adresse + x;
+    ecrire_a (15, adresse);
+
+  fin_tant_que
+
+  ecrire_a (1, 831488);
+
+fin_tant_que
