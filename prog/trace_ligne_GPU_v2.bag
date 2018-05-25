@@ -1,7 +1,7 @@
-entier x0;
-entier y0;
-entier x1;
-entier y1;
+entier x0_trace;
+entier y0_trace;
+entier x1_trace;
+entier y1_trace;
 entier dx;
 entier dy;
 entier D;
@@ -58,39 +58,39 @@ tant_que(1 < 2)
     adresse = adresse + 1;
   fin_tant_que;
 
-  x0 = 400;
-  y0 = 400;
-  x1 = 100;
-  y1 = lire_a (8192);
+  x0_trace = 400;
+  y0_trace = 400;
+  x1_trace = 100;
+  y1_trace = lire_a (8192);
 
-  si (y1 > y0)
-    diffyabs = y1 - y0;
+  si (y1_trace > y0_trace)
+    diffyabs = y1_trace - y0_trace;
   fin_si;
 
-  si (y1 < y0)
-    diffyabs = y0 - y1;
+  si (y1_trace < y0_trace)
+    diffyabs = y0_trace - y1_trace;
   fin_si;
 
-  si (x1 > x0)
-    diffxabs = x1 - x0;
+  si (x1_trace > x0_trace)
+    diffxabs = x1_trace - x0_trace;
   fin_si;
 
-  si (x1 < x0)
-    diffxabs = x0 - x1;
+  si (x1_trace < x0_trace)
+    diffxabs = x0_trace - x1_trace;
   fin_si;
 
   si (diffyabs < diffxabs)
-    si (x0 > x1)
-      tempx = x0;
-      tempy = y0;
-      x0 = x1;
-      y0 = y1;
-      x1 = tempx;
-      y1 = tempy;
+    si (x0_trace > x1_trace)
+      tempx = x0_trace;
+      tempy = y0_trace;
+      x0_trace = x1_trace;
+      y0_trace = y1_trace;
+      x1_trace = tempx;
+      y1_trace = tempy;
     fin_si
 
-    dx = x1 - x0;
-    dy = y1 - y0;
+    dx = x1_trace - x0_trace;
+    dy = y1_trace - y0_trace;
     yi = 1;
 
     si (dy < 0)
@@ -100,10 +100,10 @@ tant_que(1 < 2)
 
     D = 2 * dy;
     D = D - dx;
-    y = y0;
+    y = y0_trace;
 
-    x = x0;
-    tant_que (x < x1)
+    x = x0_trace;
+    tant_que (x < x1_trace)
 
       adresse = 640 * y;
       adresse = adresse + x;
@@ -124,17 +124,17 @@ tant_que(1 < 2)
   fin_si
 
   si (diffyabs > diffxabs)
-    si (y0 > y1)
-      tempx = x0;
-      tempy = y0;
-      x0 = x1;
-      y0 = y1;
-      x1 = tempx;
-      y1 = tempy;
+    si (y0_trace > y1_trace)
+      tempx = x0_trace;
+      tempy = y0_trace;
+      x0_trace = x1_trace;
+      y0_trace = y1_trace;
+      x1_trace = tempx;
+      y1_trace = tempy;
     fin_si
     
-    dx = x1 - x0;
-    dy = y1 - y0;
+    dx = x1_trace - x0_trace;
+    dy = y1_trace - y0_trace;
     xi = 1;
 
     si (dx < 0)
@@ -144,10 +144,10 @@ tant_que(1 < 2)
 
     D = 2 * dx;
     D = D - dy;
-    x = x0;
+    x = x0_trace;
 
-    y = y0;
-    tant_que (y < y1)
+    y = y0_trace;
+    tant_que (y < y1_trace)
 
       adresse = 640 * y;
       adresse = adresse + x;

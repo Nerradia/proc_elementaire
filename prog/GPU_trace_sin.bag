@@ -1,0 +1,43 @@
+entier a;
+entier b;
+reel c;
+entier base;
+entier y;
+base = 524288;
+
+entier adresse;
+//commentaire
+a = 0;
+
+tant_que (1 < 2)
+  adresse = 524288;              Vidage de l'écran
+  tant_que(adresse < 831487)
+    ecrire_a (0, adresse);
+    adresse = adresse + 1;
+  fin_tant_que;
+
+  retour = 1;
+  tant_que(retour > 0)
+    retour = lire_a(831488);
+  fin_tant_que;
+
+  tant_que (a < 640)
+    c = sin(b);
+    b = b + 1;
+    si(b > 360)
+      b = 0;
+    fin_si;
+    c = c + 1.;
+    c = c * 200.;
+    y = rve(c);
+    y = y + 50;
+    adresse = 640 * y;
+        adresse = adresse + a;
+        adresse = adresse + base;
+        ecrire_a (15, adresse);
+    a = a + 1;
+  fin_tant_que;
+  a = 0;
+  ecrire_a (1, 831488);
+fin_tant_que;
+

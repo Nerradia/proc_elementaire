@@ -1,0 +1,203 @@
+reel x0_trace_f;
+reel y0_trace_f;
+reel x1_trace_f;
+reel y1_trace_f;
+
+entier x0_trace;
+entier y0_trace;
+entier x1_trace;
+entier y1_trace;
+
+entier nb_seg;
+entier cpt_seg;
+entier cpt_add;
+entier dx;
+entier dy;
+entier D;
+entier xi;
+entier yi;
+entier x;
+entier y;
+entier adresse;
+entier adresse_2;
+entier valid;
+entier base;
+base = 524288;
+entier retour;
+
+entier diffxabs;
+entier diffyabs;
+entier tempx;
+entier tempy;
+entier tempD;
+
+
+adresse = 524288;              Vidage de l'écran
+tant_que(adresse < 831487)
+  ecrire_a (0, adresse);
+  adresse = adresse + 1;
+fin_tant_que;
+ecrire_a (1, 831488);
+
+
+retour = 1;
+tant_que(retour > 0)
+  retour = lire_a(831488);
+fin_tant_que;
+
+adresse = 524288;              Vidage de l'écran
+tant_que(adresse < 831487)
+  ecrire_a (0, adresse);
+  adresse = adresse + 1;
+fin_tant_que;
+ecrire_a (1, 831488);
+
+tant_que(1 < 2)
+
+
+  retour = 1;
+  //attente de disponibilité de l'écran
+  tant_que(retour > 0)          
+    retour = lire_a(831488);
+  fin_tant_que;
+
+  //nombre de points à lire
+  cpt_add = 8192;
+  nb_seg  = lire_a (8192);
+  cpt_add = cpt_add + 1;
+
+  cpt_seg = 0;
+
+  //Vidage de l'écran
+  adresse = 524288;
+  tant_que(adresse < 831487)
+    ecrire_a (0, adresse);
+    adresse = adresse + 1;
+  fin_tant_que;
+
+  tant_que ( cpt_seg < nb_seg)
+
+    x0_trace_v = lire_a (cpt_add);
+    cpt_add = cpt_add + 1;
+    y0_trace_v = lire_a (cpt_add);
+    cpt_add = cpt_add + 1;
+    x1_trace_v = lire_a (cpt_add);
+    cpt_add = cpt_add + 1;
+    y1_trace_v = lire_a (cpt_add);
+    cpt_add = cpt_add + 1;
+
+    x0_trace = rve(x0_trace_v);
+    y0_trace = rve(y0_trace_v);
+    x1_trace = rve(x1_trace_v);
+    y1_trace = rve(y1_trace_v);
+    
+    si (y1_trace > y0_trace)
+      diffyabs = y1_trace - y0_trace;
+    fin_si;
+
+    si (y1_trace < y0_trace)
+      diffyabs = y0_trace - y1_trace;
+    fin_si;
+
+    si (x1_trace > x0_trace)
+      diffxabs = x1_trace - x0_trace;
+    fin_si;
+
+    si (x1_trace < x0_trace)
+      diffxabs = x0_trace - x1_trace;
+    fin_si;
+
+    si (diffyabs < diffxabs)
+      si (x0_trace > x1_trace)
+        tempx = x0_trace;
+        tempy = y0_trace;
+        x0_trace = x1_trace;
+        y0_trace = y1_trace;
+        x1_trace = tempx;
+        y1_trace = tempy;
+      fin_si
+
+      dx = x1_trace - x0_trace;
+      dy = y1_trace - y0_trace;
+      yi = 1;
+
+      si (dy < 0)
+        yi = -1;
+        dy = 0 - dy;
+      fin_si
+
+      D = 2 * dy;
+      D = D - dx;
+      y = y0_trace;
+
+      x = x0_trace;
+      tant_que (x < x1_trace)
+
+        adresse = 640 * y;
+        adresse = adresse + x;
+        adresse = adresse + base;
+        ecrire_a (15, adresse);
+
+        si (D > 0)
+          y = y + yi;
+          tempD = 2 * dx;
+          D = D - tempD;
+        fin_si
+
+        tempD = 2 * dy;
+        D = D + tempD;
+        x = x + 1;
+      fin_tant_que
+
+    fin_si
+
+    si (diffyabs > diffxabs)
+      si (y0_trace > y1_trace)
+        tempx = x0_trace;
+        tempy = y0_trace;
+        x0_trace = x1_trace;
+        y0_trace = y1_trace;
+        x1_trace = tempx;
+        y1_trace = tempy;
+      fin_si
+      
+      dx = x1_trace - x0_trace;
+      dy = y1_trace - y0_trace;
+      xi = 1;
+
+      si (dx < 0)
+        xi = -1;
+        dx = 0 - dx;
+      fin_si
+
+      D = 2 * dx;
+      D = D - dy;
+      x = x0_trace;
+
+      y = y0_trace;
+      tant_que (y < y1_trace)
+
+        adresse = 640 * y;
+        adresse = adresse + x;
+        adresse = adresse + base;
+        ecrire_a (15, adresse);
+
+        si (D > 0)
+          x = x + xi;
+          tempD = 2 * dy;
+          D = D - tempD;
+        fin_si
+
+        tempD = 2 * dx;
+        D = D + tempD;
+        y = y + 1;
+      fin_tant_que
+    fin_si
+    cpt_seg = cpt_seg + 1;
+  //fin parcours segments
+  fin_tant_que;
+  //ecriture à l'écran
+  ecrire_a (1, 831488);
+
+//fin boucle infinie
+fin_tant_que 

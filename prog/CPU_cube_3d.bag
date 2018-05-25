@@ -1,7 +1,9 @@
 entier a_cos; 
 entier a_sin; 
+entier a;
 entier b; 
-entier c; 
+entier c;
+
 reel decalage_x; 
 reel decalage_y; 
 reel x1_o; 
@@ -50,110 +52,68 @@ reel yx;
 reel yy;
 reel zx;
 reel zy;
-reel add_p1; 
-reel add_p2; 
-reel add_p3; 
-reel add_p4; 
-reel add_p5; 
-reel add_p6; 
-reel add_p7; 
-reel add_p8; 
 reel temp1;
-reel temp2;
-reel temp3;
 reel sa; 
 reel sb; 
 reel sc; 
 reel ca; 
 reel cb; 
 reel cc; 
-entier tempconv;
-entier retour;
-entier base;
-entier adresse;
 
-//pour les lignes
-entier x0_trace;
-entier y0_trace;
-entier x1_trace;
-entier y1_trace;
-entier dx;
-entier dy;
-entier D;
-entier xi;
-entier yi;
-entier x;
-entier y;
-entier adresse;
-entier adresse_2;
-entier valid;
-entier base;
-base = 524288;
 entier retour;
 
-entier diffxabs;
-entier diffyabs;
-entier tempx;
-entier tempy;
-entier tempD;
-
-
-
-
-base = 524288;
 retour = 1;
-taille = 100;
+
 x1_o = 100.; 
-x2_o = 100.;
-x3_o = -100.;
-x4_o = -100.;
-x5_o = 100.;
-x6_o = 100.;
-x7_o = -100.;
-x8_o = -100.;
 y1_o = 100.;
-y2_o = 100.;
-y3_o = 100.;
-y4_o = 100.;
-y5_o = -100.;
-y6_o = -100.;
-y7_o = -100.;
-y8_o = -100.;
 z1_o = -100.;
+
+x2_o = 100.;
+y2_o = 100.;
 z2_o = 100.;
+
+x3_o = -100.;
+y3_o = 100.;
 z3_o = 100.;
+
+x4_o = -100.;
+y4_o = 100.;
 z4_o = -100.;
+
+x5_o = 100.;
+y5_o = -100.;
 z5_o = -100.;
+
+x6_o = 100.;
+y6_o = -100.;
 z6_o = 100.;
+
+x7_o = -100.;
+y7_o = -100.;
 z7_o = 100.;
+
+x8_o = -100.;
+y8_o = -100.;
 z8_o = -100.;
 
-adresse = 524288;              Vidage de l'écran
-tant_que(adresse < 831487)
-  ecrire_a (0, adresse);
-  adresse = adresse + 1;
-fin_tant_que;
-ecrire_a (1, 831488);
 retour = 1;
 
-tant_que(retour > 0)
-  retour = lire_a(831488);
-fin_tant_que;
+a_cos = 1;
+a_sin = 1;
 
-adresse = 524288;              Vidage de l'écran
-tant_que(adresse < 831487)
-  ecrire_a (0, adresse);
-  adresse = adresse + 1;
-fin_tant_que;
 
-ecrire_a (1, 831488);
-
-a_cos = a_cos + 2;
-a_sin = a_sin + 2;
+  ecrire_a(1, 8240);
 tant_que(1 < 2)
+
+  retour = lire_a(8240)
   tant_que(retour > 0)
-    retour = lire_a(831488);
+    retour = lire_a(8240);
   fin_tant_que;
+  a = 0;
+  tant_que(a < 1000000) 
+    a = a + 1;
+  fin_tant_que;
+  ecrire_a (1, 8240);
 
   a_cos = a_cos + 1;
   a_sin = a_sin + 1;
@@ -177,8 +137,6 @@ tant_que(1 < 2)
   ca = cos(a_cos);
   cb = cos(b);
   cc = cos(c);
-
-  afficher_LCD(cc);
 
   xx    = cc * ca;    
   temp1 = sc * sa;
@@ -320,80 +278,70 @@ tant_que(1 < 2)
   x8 = x8 + decalage_x;
   y8 = y8 + decalage_y;
 
-  adresse = 524288;              Vidage de l'écran
-  tant_que(adresse < 831487)
-    ecrire_a (0, adresse);
-    adresse = adresse + 1;
-  fin_tant_que;
-  ecrire_a (1, 831488);
-  //traçage des lignes
+  temp1 = lire_a(8245);
+  ecrire_a (12, 8192);
 
+  afficher_LCD( temp1 );
+  // segment 1  : S[1;2]
+  ecrire_a (x1, 8193);
+  ecrire_a (y1, 8194);
+  ecrire_a (x2, 8195);
+  ecrire_a (y2, 8196);
+  // segment 2  : S[1;4]
+  ecrire_a (x1, 8196);
+  ecrire_a (y1, 8197);
+  ecrire_a (x4, 8198);
+  ecrire_a (y4, 8199);
+  // segment 3  : S[1;5]
+  ecrire_a (x1, 8200);
+  ecrire_a (y1, 8201);
+  ecrire_a (x5, 8202);
+  ecrire_a (y5, 8203);
+  // segment 4  : S[2;3]
+  ecrire_a (x2, 8204);
+  ecrire_a (y2, 8205);
+  ecrire_a (x3, 8206);
+  ecrire_a (y3, 8207);
+  // segment 5  : S[2;6]
+  ecrire_a (x2, 8208);
+  ecrire_a (y2, 8209);
+  ecrire_a (x6, 8210);
+  ecrire_a (y6, 8211);
+  // segment 6  : S[3;4]
+  ecrire_a (x3, 8212);
+  ecrire_a (y3, 8213);
+  ecrire_a (x4, 8214);
+  ecrire_a (y4, 8215);
+  // segment 7  : S[3;7]
+  ecrire_a (x3, 8216);
+  ecrire_a (y3, 8217);
+  ecrire_a (x4, 8218);
+  ecrire_a (y4, 8219);
+  // segment 8  : S[4;8]
+  ecrire_a (x4, 8220);
+  ecrire_a (y4, 8221);
+  ecrire_a (x8, 8222);
+  ecrire_a (y8, 8223);
+  // segment 9  : S[5;8]
+  ecrire_a (x5, 8224);
+  ecrire_a (y5, 8225);
+  ecrire_a (x8, 8226);
+  ecrire_a (y8, 8227);
+  // segment 10 : S[5;6]
+  ecrire_a (x5, 8228);
+  ecrire_a (y5, 8229);
+  ecrire_a (x6, 8230);
+  ecrire_a (y6, 8231);
+  // segment 11 : S[6;7]
+  ecrire_a (x6, 8232);
+  ecrire_a (y6, 8233);
+  ecrire_a (x7, 8234);
+  ecrire_a (y7, 8235);
+  // segment 12 : S[7;8]
+  ecrire_a (x7, 8236);
+  ecrire_a (y7, 8237);
+  ecrire_a (x8, 8238);
+  ecrire_a (y8, 8239);
 
-
-  //traçage des points
-  tempconv = rve(y1);
-  adresse = 640 * tempconv;
-  tempconv = rve(x1);
-  adresse = adresse + tempconv;
-  adresse = adresse + base;
-  ecrire_a (15, adresse);
-  add_p1 = adresse;
-
-  tempconv = rve(y2);
-  adresse = 640 * tempconv;
-  tempconv = rve (x2);
-  adresse = adresse + tempconv;
-  adresse = adresse + base;
-  ecrire_a (15, adresse);
-  add_p2 = adresse;
-
-  tempconv = rve(y3);
-  adresse = 640 * tempconv;
-  tempconv = rve (x3);
-  adresse = adresse + tempconv;
-  adresse = adresse + base;
-  ecrire_a (15, adresse);
-  add_p3 = adresse;
-
-  tempconv = rve(y4);
-  adresse = 640 * tempconv;
-  tempconv = rve (x4);
-  adresse = adresse + tempconv;
-  adresse = adresse + base;
-  ecrire_a (15, adresse);
-  add_p4 = adresse;
-
-  tempconv = rve(y5);
-  adresse = 640 * tempconv;
-  tempconv = rve (x5);
-  adresse = adresse + tempconv;
-  adresse = adresse + base;
-  ecrire_a (15, adresse);
-  add_p5 = adresse;
-
-  tempconv = rve(y6);
-  adresse = 640 * tempconv;
-  tempconv = rve (x6);
-  adresse = adresse + tempconv;
-  adresse = adresse + base;
-  ecrire_a (15, adresse);
-  add_p6 = adresse;
-
-  tempconv = rve(y7);
-  adresse = 640 * tempconv;
-  tempconv = rve (x7);
-  adresse = adresse + tempconv;
-  adresse = adresse + base;
-  ecrire_a (15, adresse);
-  add_p7 = adresse;
-
-  tempconv = rve(y8);
-  adresse = 640 * tempconv;
-  tempconv = rve (x8);
-  adresse = adresse + tempconv;
-  adresse = adresse + base;
-  ecrire_a (15, adresse);
-  add_p8 = adresse;
-
-  ecrire_a(1, 831488);
 fin_tant_que;
+

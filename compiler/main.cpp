@@ -256,6 +256,14 @@ std::string argument_condition2 (std::string str, std::string type) {
   return strNew;
 }
 
+std::string find_between (std::string str, std::string start, std::string end) {
+  unsigned first = str.find(start) + strlen(start.c_str());
+  unsigned last = str.find(end);
+  std::string strNew = str.substr (first, last-first);
+  return strNew;
+}
+
+
 std::string condition_type (std::string str) {
   if (str.find(">")  != std::string::npos)
     return ">";
@@ -294,7 +302,7 @@ int loop_to_loop (std::vector<instruction*> & ins_v, int toClose) {
   for ( unsigned int i = ins_v.size() - 1; i > 0; i-- ) {
     if(ins_v[i]->type == TANT_QUE)
       if(ins_v[i]->num == toClose) {
-        printf("looping %d at address %d\n",ins_v[i]->num, ins_v[i]->address );
+        //printf("looping %d at address %d\n",ins_v[i]->num, ins_v[i]->address );
         ins_v[i]->is_closed = true;
         return ins_v[i]->address;
       }
@@ -322,6 +330,19 @@ var variable ( std::string name, std::vector<var> &var_v ) {
       return var_v[i];
   }
   return v;
+}
+
+int word_occurence_count ( std::string const & str, std::string const &word) {
+  int count = 0;
+  std::string::size_type word_pos( 0 );
+  while ( word_pos != std::string::npos ) {
+    word_pos = str.find( word, word_pos );
+    if ( word_pos != std::string::npos ) {
+      ++count;
+      word_pos += word.length();
+    }
+  }
+  return count;
 }
 
 int main(int argc, char const *argv[])
@@ -369,49 +390,66 @@ int main(int argc, char const *argv[])
     v.name = "0";
     v.value = 0;
     v.type = INTEGER;
+    v.is_standard = true;
     var_v.push_back(v);
     v.name = "0.";
     v.value = 0;
     v.type = REAL;
+    v.is_standard = true;
     var_v.push_back(v);
     // 1
     v.name = "1";
     v.value = 1;
     v.type = INTEGER;
+    v.is_standard = true;
     var_v.push_back(v);
-    // 1
+    // 180
     v.name = "180";
     v.value = 0xB4;
     v.type = INTEGER;
+    v.is_standard = true;
+    var_v.push_back(v);
+    // 90
+    v.name = "90";
+    v.value = 0x5A;
+    v.type = INTEGER;
+    v.is_standard = true;
     var_v.push_back(v);
     // FF
     v.name = "FFFFFFF";
     v.value = 0xFFFFFFF;
     v.type = INTEGER;
+    v.is_standard = true;
     var_v.push_back(v);
     // sine index
     v.name = "SININDEX";
     v.value = 0x0003000;
     v.type = INTEGER;
+    v.is_standard = true;
     var_v.push_back(v);
     
     // sine index
     v.name = "SHARED_INDEX";
     v.value = 0x0002000;
+    v.is_standard = true;
     var_v.push_back(v);
     
     // dummy index
     v.name = "DUMMY";
     v.value = 0x0000000;
+    v.is_standard = true;
     var_v.push_back(v);
+
+    v.is_standard = false;
 
   //parser
   while ( getline(in_f, line) ) {
-    printf ( "%s\n", line.c_str() );
+    //printf ( "%s\n", line.c_str() );
     line = ReplaceAll(line, " ", "");
-    if(line.length() < 2) break;
-    if ( line.at(0) == '/' && line.at(1) == '/' ) {
-      //to nothing, it's a comment
+    if(line.length() < 2) {
+      //do nothing, nothing to do
+    } else if ( line.at(0) == '/' && line.at(1) == '/' ) {
+      //do nothing, it's a comment
 
     } else if ( line.find("entier")    != std::string::npos ) {
       v.name = find_name(line);
@@ -729,7 +767,7 @@ int main(int argc, char const *argv[])
 
       ins_v.push_back(ins);
     } else {
-      //printf("==> autre ? \n");
+      std::cerr << "\033[1;31mUnkown instruction: " << line << "\033[0m" << std::endl;
     }
   }
   
@@ -748,7 +786,7 @@ int main(int argc, char const *argv[])
       char temp2[30] = "";
       sprintf (temp1, ":condition(%d)", ins_v[i]->num);
       sprintf (temp2, "%05x", index_ram);
-      printf("replacing: %s by %s .\n", temp1, temp2 );
+      //printf("replacing: %s by %s .\n", temp1, temp2 );
       whole_file = ReplaceAll (whole_file, std::string(temp1), std::string(temp2));
     }
 
@@ -756,15 +794,15 @@ int main(int argc, char const *argv[])
        //we are in a condition
       char temp1[30] = "";
       char temp2[30] = "";
-      printf(" numéro de l'instruction: %d\n", ins_v[i]->num );
+      //printf(" numéro de l'instruction: %d\n", ins_v[i]->num );
       int toClose = ins_v[i]->num;
       sprintf (temp1, ":endloop(%d)", toClose);
       sprintf (temp2, "%05x", index_ram); //TODO: verify that
-      printf("replacing: %s by %s .\n", temp1, temp2 );
+      //printf("replacing: %s by %s .\n", temp1, temp2 );
       whole_file = ReplaceAll (whole_file, std::string(temp1), std::string(temp2));
       sprintf (temp1, ":loop(%d)", toClose);
       sprintf (temp2, "%05x", loop_to_loop(ins_v,toClose)); //TODO: verify that
-      printf("replacing: %s by %s .\n", temp1, temp2 );
+      //printf("replacing: %s by %s .\n", temp1, temp2 );
       whole_file = ReplaceAll (whole_file, std::string(temp1), std::string(temp2));
     }
   }
@@ -783,6 +821,13 @@ int main(int argc, char const *argv[])
     var_v[i].address = index_ram;
     index_ram++;
     
+    if ( word_occurence_count ( whole_file, var_v[i].name ) < 2) {
+      if ( !var_v[i].is_standard && var_v[i].value == 0) {
+        printf("Warning: unsused variable: %s\n", var_v[i].name.c_str() );
+      }
+    }
+
+
     //replacement of the variable name in the program with the address
     char temp1[30] = "";
     char temp2[30] = "";
@@ -804,6 +849,10 @@ int main(int argc, char const *argv[])
     std::cerr << "\033[1;31mError: " << conditions.size() * -1 << " more condition(s) closed than open\033[0m" << std::endl;
   if ( conditions.size() > 0)
     std::cerr << "\033[1;31mError: " << conditions.size() << " condition(s) has not been closed\033[0m" << std::endl;
+
+  if ( whole_file.find(":addr(")  != std::string::npos ) {
+    std::cerr << "\033[1;31mError: Variable not declared: " << find_between ( whole_file, ":addr(", ")") << "\033[0m" << std::endl;
+  }
 
   printf("This program has a total of %d lines = %.2f%% of the maximum\n", 
           index_ram,

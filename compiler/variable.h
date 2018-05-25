@@ -23,6 +23,7 @@ public:
 public: 
   std::string name;
   varType type;
+  bool is_standard;
   int32_t value;
   uint32_t address;
 };

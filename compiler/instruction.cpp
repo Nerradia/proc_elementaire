@@ -38,6 +38,7 @@ std::string addition::print_instruction() {
     instructions += "FAD :addr(" + a2.name   + ")\n";
     instructions += "STA :addr(" + var_.name + ")\n";
   } else {
+    fprintf(stderr, "\033[1;31m==> %s + %s \033[0m\n", a1.name.c_str(), a2.name.c_str());
     fprintf(stderr, "\033[1;31mYou can only add variable with the same type\033[0m\n");
   }
   return instructions;
@@ -71,6 +72,7 @@ std::string soustraction::print_instruction() {
     instructions += "SUB :addr(" + a2.name   + ")\n";
     instructions += "STA :addr(" + var_.name + ")\n";
   } else {
+    fprintf(stderr, "\033[1;31m==> %s - %s \033[0m\n", a1.name.c_str(), a2.name.c_str());
     fprintf(stderr, "\033[1;31mYou can only substract variable with the same type\033[0m\n");
   }
   return instructions;
@@ -92,7 +94,8 @@ std::string multiplication::print_instruction() {
     instructions += "FMU :addr(" + a2.name   + ")\n";
     instructions += "STA :addr(" + var_.name + ")\n";
   } else {
-    fprintf(stderr, "\033[1;31mYou can only add variable with the same type\033[0m\n");
+    fprintf(stderr, "\033[1;31m==> %s * %s \033[0m\n", a1.name.c_str(), a2.name.c_str());
+    fprintf(stderr, "\033[1;31mYou can only multiply variable with the same type\033[0m\n");
   }
   return instructions;
 }
@@ -215,7 +218,7 @@ cos::cos() {
 std::string cos::print_instruction() {
   std::string instructions = "";
   instructions += "GET :addr(" + a1.name + ")\n";
-  instructions += "ADD :addr(180)\n";
+  instructions += "ADD :addr(90)\n";
   instructions += "ADD :addr(SININDEX)\n";
   instructions += "STA :addr(DUMMY)\n";
   instructions += "GAD :addr(DUMMY)\n"; //get @ address

@@ -176,7 +176,7 @@ int main(int argc, char const *argv[])
 
   int n = 1;
   int counter = 0;
-  char file_read[10000] = "";
+  char file_read[1000000] = "";
 
   while (n > 0) {
     switch(state) {
@@ -227,9 +227,9 @@ int main(int argc, char const *argv[])
             output = val;
           }
 
-          printf( "instruction %d:\t %07x\t(hex)\n", 
-                  counter, 
-                  output );
+          //printf( "instruction %d:\t %07x\t(hex)\n", 
+          //        counter, 
+          //        output );
           sprintf( outputHex, "%07x\n", output);
           write( out_f, outputHex, strlen(outputHex));
           counter ++;
@@ -242,6 +242,7 @@ int main(int argc, char const *argv[])
   }
   //printf("Fichier lu: \n%s\n", file_read);
 
+  
   printf("End of program\n");
 
   flock(in_f, LOCK_UN);
@@ -251,3 +252,5 @@ int main(int argc, char const *argv[])
   
   return 0;
 }
+
+
