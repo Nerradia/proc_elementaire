@@ -102,7 +102,7 @@ a_cos = 1;
 a_sin = 1;
 
 
-  ecrire_a(1, 8240);
+ecrire_a(1, 8240);
 tant_que(1 < 2)
 
   retour = lire_a(8240)

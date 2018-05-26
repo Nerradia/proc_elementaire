@@ -1,7 +1,7 @@
-reel x0_trace_f;
-reel y0_trace_f;
-reel x1_trace_f;
-reel y1_trace_f;
+reel x0_trace_v;
+reel y0_trace_v;
+reel x1_trace_v;
+reel y1_trace_v;
 
 entier x0_trace;
 entier y0_trace;
@@ -19,10 +19,6 @@ entier yi;
 entier x;
 entier y;
 entier adresse;
-entier adresse_2;
-entier valid;
-entier base;
-base = 524288;
 entier retour;
 
 entier diffxabs;
@@ -31,8 +27,10 @@ entier tempx;
 entier tempy;
 entier tempD;
 
+entier base;
+base = 524288;
 
-adresse = 524288;              Vidage de l'écran
+adresse = base;              Vidage de l'écran
 tant_que(adresse < 831487)
   ecrire_a (0, adresse);
   adresse = adresse + 1;
@@ -45,31 +43,32 @@ tant_que(retour > 0)
   retour = lire_a(831488);
 fin_tant_que;
 
-adresse = 524288;              Vidage de l'écran
+adresse = base;              Vidage de l'écran
 tant_que(adresse < 831487)
   ecrire_a (0, adresse);
   adresse = adresse + 1;
 fin_tant_que;
 ecrire_a (1, 831488);
 
+//boucle infinie
 tant_que(1 < 2)
 
-
-  retour = 1;
+  retour = lire_a(831488);
   //attente de disponibilité de l'écran
   tant_que(retour > 0)          
     retour = lire_a(831488);
   fin_tant_que;
+  retour = 1;
 
   //nombre de points à lire
   cpt_add = 8192;
-  nb_seg  = lire_a (8192);
+  nb_seg  = lire_a ( cpt_add );
   cpt_add = cpt_add + 1;
 
   cpt_seg = 0;
 
   //Vidage de l'écran
-  adresse = 524288;
+  adresse = base;
   tant_que(adresse < 831487)
     ecrire_a (0, adresse);
     adresse = adresse + 1;
