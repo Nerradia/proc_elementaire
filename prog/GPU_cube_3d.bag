@@ -54,12 +54,12 @@ tant_que(1 < 2)
 
   cpt_seg = 0;
 
-  //Vidage de l'écran
-  adresse = base;
-  tant_que(adresse < 831487)
-    ecrire_a (0, adresse);
-    adresse = adresse + 1;
-  fin_tant_que;
+  ////Vidage de l'écran
+  //adresse = base;
+  //tant_que(adresse < 831487)
+  //  ecrire_a (0, adresse);
+  //  adresse = adresse + 1;
+  //fin_tant_que;
 
   tant_que ( cpt_seg < nb_seg)
 

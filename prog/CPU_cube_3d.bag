@@ -115,15 +115,15 @@ tant_que(1 < 2)
   a_sin = a_sin + 1;
   
   tant_que (a_sin > 360)
-    a_sin = 0;
+    a_sin = a_sin - 360;
   fin_tant_que;
   
   tant_que (a_cos > 270)
     a_cos = a_cos - 360;
   fin_tant_que;
 
-  b = 45;
-  c = 170;
+  b = 20;
+  c = 5;
   decalage_x = 320.; 
   decalage_y = 240.; 
 

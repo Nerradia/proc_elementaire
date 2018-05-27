@@ -77,7 +77,14 @@ signal TOP_display : boolean := false;               -- this signal is true when
 signal pix_read_addr : integer range 0 to 307199:=0;  -- the address at which displayed data is read
 
 signal next_pixel : std_logic_vector(bit_per_pixel - 1 downto 0);  -- the data coding the value of the pixel to be displayed
-  
+
+signal emptying_buffer : std_logic := '0';
+signal emptying_we     : std_logic := '0';
+signal emptying_addr : std_logic_vector(18 downto 0);
+signal emptying_data : std_logic_vector(bit_per_pixel - 1 downto 0);
+
+signal empt_cpt : integer range 0 to 307199;
+
 begin
 
 ram_screen_0 : ram_screen
@@ -99,17 +106,30 @@ ram_screen_1 : ram_screen
     );
 
 -- buffer 0 is accessible by the CPU when it's not shown
-we_0      <= data_write when current_buffer = 1 else '0';
-addr_0    <= ADDR       when current_buffer = 1 else std_logic_vector(to_unsigned(pix_read_addr, addr_0'length));
-din_0     <= data_in    when current_buffer = 1 else (others => '0');
+we_0      <= '0'        when current_buffer = 0
+             else '1'   when emptying_buffer = '1'
+             else data_write;
+addr_0    <= std_logic_vector(to_unsigned(pix_read_addr, addr_0'length)) when current_buffer = 0 -- Buffer 0 is shown
+            else emptying_addr when emptying_buffer = '1' -- Buffer is being reset
+            else ADDR;    -- Buffer is ready to be accessed by CPU
+din_0     <= (others => '0')   when current_buffer = 0 
+            else emptying_data when emptying_buffer = '1'
+            else data_in;
 
 -- buffer 1 is accessible by the CPU when it's not shown
-we_1      <= data_write when current_buffer = 0 else '0';
-addr_1    <= ADDR       when current_buffer = 0 else std_logic_vector(to_unsigned(pix_read_addr, addr_1'length));
-din_1     <= data_in    when current_buffer = 0 else (others => '0');
+we_1      <= '0'        when current_buffer = 1
+             else '1'   when emptying_buffer = '1'
+             else data_write;
+addr_1    <= std_logic_vector(to_unsigned(pix_read_addr, addr_0'length)) when current_buffer = 1 -- Buffer 1 is shown
+            else emptying_addr when emptying_buffer = '1' -- Buffer is being reset
+            else ADDR;    -- Buffer is ready to be accessed by CPU
+din_1     <= (others => '0')   when current_buffer = 1 
+            else emptying_data when emptying_buffer = '1'
+            else data_in;
 
 -- CPU's reads are on the not currently shown buffer
-data_out  <= "000" & screen_buffer_rdy  when ADDR = std_logic_vector(to_unsigned(16#cb000#, ADDR'length))
+data_out  <= (others => '1') when emptying_buffer = '1'
+          else "000" & screen_buffer_rdy  when ADDR = std_logic_vector(to_unsigned(16#cb000#, ADDR'length))
           else dout_0   when current_buffer = 1
           else dout_1;
 
@@ -127,14 +147,30 @@ begin
     end if;
 
     -- Vsync
-    if v_counter = 0 and screen_buffer_rdy = '1' then
+    if v_counter = 0 and screen_buffer_rdy = '1' and emptying_buffer = '0' then
       if current_buffer = 0 then
         current_buffer <= 1;
       else
         current_buffer <= 0;
       end if;
+
+      emptying_buffer <= '1';
+    end if;
+
+    if emptying_buffer = '1' then
+
+      if empt_cpt = 307199 then
+        screen_buffer_rdy <= '0';
+        emptying_buffer <= '0';
+        empt_cpt <= 0;
+
+      else 
+        empt_cpt <= empt_cpt + 1;
+        emptying_addr <= std_logic_vector(to_unsigned(empt_cpt, emptying_addr'length));
+        emptying_data <= (others => '0');
       
-      screen_buffer_rdy <= '0';
+      end if;
+
     end if;
 
   end if;
