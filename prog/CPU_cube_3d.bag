@@ -102,18 +102,14 @@ a_cos = 1;
 a_sin = 1;
 
 
-ecrire_a(1, 8240);
+ecrire_a(1, 8241);
 tant_que(1 < 2)
 
-  retour = lire_a(8240)
-  tant_que(retour > 0)
-    retour = lire_a(8240);
-  fin_tant_que;
-  a = 0;
-  tant_que(a < 1000000) 
-    a = a + 1;
-  fin_tant_que;
-  ecrire_a (1, 8240);
+
+//  a = 0;
+//  tant_que(a < 100000) 
+//    a = a + 1;
+//  fin_tant_que;
 
   a_cos = a_cos + 1;
   a_sin = a_sin + 1;
@@ -278,70 +274,78 @@ tant_que(1 < 2)
   x8 = x8 + decalage_x;
   y8 = y8 + decalage_y;
 
-  temp1 = lire_a(8245);
   ecrire_a (12, 8192);
 
-  afficher_LCD( temp1 );
-  // segment 1  : S[1;2]
+  // On attend que le GPU ait fini d'utiliser les données précédentes.
+  retour = lire_a(8241)
+  tant_que(retour < 1)
+    retour = lire_a(8241);
+  fin_tant_que;
+  ecrire_a (1, 8241);
+
+// segment 1  : S[1;2]
   ecrire_a (x1, 8193);
   ecrire_a (y1, 8194);
   ecrire_a (x2, 8195);
   ecrire_a (y2, 8196);
-  // segment 2  : S[1;4]
-  ecrire_a (x1, 8196);
-  ecrire_a (y1, 8197);
-  ecrire_a (x4, 8198);
-  ecrire_a (y4, 8199);
-  // segment 3  : S[1;5]
-  ecrire_a (x1, 8200);
-  ecrire_a (y1, 8201);
-  ecrire_a (x5, 8202);
-  ecrire_a (y5, 8203);
-  // segment 4  : S[2;3]
-  ecrire_a (x2, 8204);
-  ecrire_a (y2, 8205);
-  ecrire_a (x3, 8206);
-  ecrire_a (y3, 8207);
-  // segment 5  : S[2;6]
-  ecrire_a (x2, 8208);
-  ecrire_a (y2, 8209);
-  ecrire_a (x6, 8210);
-  ecrire_a (y6, 8211);
-  // segment 6  : S[3;4]
-  ecrire_a (x3, 8212);
-  ecrire_a (y3, 8213);
-  ecrire_a (x4, 8214);
-  ecrire_a (y4, 8215);
-  // segment 7  : S[3;7]
-  ecrire_a (x3, 8216);
-  ecrire_a (y3, 8217);
-  ecrire_a (x4, 8218);
-  ecrire_a (y4, 8219);
-  // segment 8  : S[4;8]
-  ecrire_a (x4, 8220);
-  ecrire_a (y4, 8221);
-  ecrire_a (x8, 8222);
-  ecrire_a (y8, 8223);
-  // segment 9  : S[5;8]
-  ecrire_a (x5, 8224);
-  ecrire_a (y5, 8225);
-  ecrire_a (x8, 8226);
-  ecrire_a (y8, 8227);
-  // segment 10 : S[5;6]
-  ecrire_a (x5, 8228);
-  ecrire_a (y5, 8229);
-  ecrire_a (x6, 8230);
-  ecrire_a (y6, 8231);
-  // segment 11 : S[6;7]
-  ecrire_a (x6, 8232);
-  ecrire_a (y6, 8233);
-  ecrire_a (x7, 8234);
-  ecrire_a (y7, 8235);
-  // segment 12 : S[7;8]
-  ecrire_a (x7, 8236);
-  ecrire_a (y7, 8237);
-  ecrire_a (x8, 8238);
-  ecrire_a (y8, 8239);
+// segment 2  : S[1;4]
+  ecrire_a (x1, 8197);
+  ecrire_a (y1, 8198);
+  ecrire_a (x4, 8199);
+  ecrire_a (y4, 8200);
+// segment 3  : S[1;5]
+  ecrire_a (x1, 8201);
+  ecrire_a (y1, 8202);
+  ecrire_a (x5, 8203);
+  ecrire_a (y5, 8204);
+// segment 4  : S[2;3]
+  ecrire_a (x2, 8205);
+  ecrire_a (y2, 8206);
+  ecrire_a (x3, 8207);
+  ecrire_a (y3, 8208);
+// segment 5  : S[2;6]
+  ecrire_a (x2, 8209);
+  ecrire_a (y2, 8210);
+  ecrire_a (x6, 8211);
+  ecrire_a (y6, 8212);
+// segment 6  : S[3;4]
+  ecrire_a (x3, 8213);
+  ecrire_a (y3, 8214);
+  ecrire_a (x4, 8215);
+  ecrire_a (y4, 8216);
+// segment 7  : S[3;7]
+  ecrire_a (x3, 8217);
+  ecrire_a (y3, 8218);
+  ecrire_a (x7, 8219);
+  ecrire_a (y7, 8220);
+// segment 8  : S[4;8]
+  ecrire_a (x4, 8221);
+  ecrire_a (y4, 8222);
+  ecrire_a (x8, 8223);
+  ecrire_a (y8, 8224);
+// segment 9  : S[5;8]
+  ecrire_a (x5, 8225);
+  ecrire_a (y5, 8226);
+  ecrire_a (x8, 8227);
+  ecrire_a (y8, 8228);
+// segment 10 : S[5;6]
+  ecrire_a (x5, 8229);
+  ecrire_a (y5, 8230);
+  ecrire_a (x6, 8231);
+  ecrire_a (y6, 8232);
+// segment 11 : S[6;7]
+  ecrire_a (x6, 8233);
+  ecrire_a (y6, 8234);
+  ecrire_a (x7, 8235);
+  ecrire_a (y7, 8236);
+// segment 12 : S[7;8]
+  ecrire_a (x7, 8237);
+  ecrire_a (y7, 8238);
+  ecrire_a (x8, 8239);
+  ecrire_a (y8, 8240);
+
+
+  ecrire_a (0, 8241); // Données prêtes
 
 fin_tant_que;
 

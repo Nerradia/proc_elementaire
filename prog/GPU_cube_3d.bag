@@ -30,35 +30,22 @@ entier tempD;
 entier base;
 base = 524288;
 
-adresse = base;              Vidage de l'écran
-tant_que(adresse < 831487)
-  ecrire_a (0, adresse);
-  adresse = adresse + 1;
-fin_tant_que;
-ecrire_a (1, 831488);
-
-
-retour = 1;
-tant_que(retour > 0)
-  retour = lire_a(831488);
-fin_tant_que;
-
-adresse = base;              Vidage de l'écran
-tant_que(adresse < 831487)
-  ecrire_a (0, adresse);
-  adresse = adresse + 1;
-fin_tant_que;
-ecrire_a (1, 831488);
 
 //boucle infinie
 tant_que(1 < 2)
 
   retour = lire_a(831488);
-  //attente de disponibilité de l'écran
+  //Attente de la disponibilité d'un buffer d'écran
   tant_que(retour > 0)          
     retour = lire_a(831488);
   fin_tant_que;
-  retour = 1;
+
+  // Attente des données du CPU
+  retour = lire_a(8241)
+  tant_que(retour > 0)
+    retour = lire_a(8241);
+  fin_tant_que;
+  ecrire_a(1, 8241);
 
   //nombre de points à lire
   cpt_add = 8192;
@@ -192,11 +179,15 @@ tant_que(1 < 2)
         y = y + 1;
       fin_tant_que
     fin_si
+
     cpt_seg = cpt_seg + 1;
   //fin parcours segments
   fin_tant_que;
   //ecriture à l'écran
   ecrire_a (1, 831488);
+
+  // On a fini d'utiliser les données
+  ecrire_a (1, 8241);
 
 //fin boucle infinie
 fin_tant_que 
