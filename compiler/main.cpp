@@ -630,6 +630,23 @@ int main(int argc, char const *argv[])
 
       ins_v.push_back(ins);
     
+    } else if ( line.find("/")  != std::string::npos) {
+
+      ins = new division;
+
+      v.name = variable_to_change(line);
+      v = variable( v.name, var_v );
+      ins->set_return_var( v );
+      v.name = find_between ( line, "=", "/");
+      v = variable( v.name, var_v );
+      ins->set_argument1( v );
+
+      v.name = find_between ( line, "/", ";");
+      v = variable( v.name, var_v );
+      ins->set_argument2( v );
+
+      ins_v.push_back(ins);
+    
     } else if ( line.find("fin_si") != std::string::npos ) {
       ins = new endif;
       ins->num = conditions.top();

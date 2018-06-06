@@ -44,6 +44,28 @@ std::string addition::print_instruction() {
   return instructions;
 }
 
+division::division() {
+  nb_ins = 3;
+  type = DIVISION;
+}
+
+std::string division::print_instruction() {
+  std::string instructions = "";
+  if(a1.type == INTEGER && a2.type == INTEGER) {
+    instructions += "GET :addr(" + a1.name   + ")\n";
+    instructions += "DIV :addr(" + a2.name   + ")\n";
+    instructions += "STA :addr(" + var_.name + ")\n";
+  } else if (a1.type == REAL && a2.type == REAL) {
+    instructions += "GET :addr(" + a1.name   + ")\n";
+    instructions += "FDI :addr(" + a2.name   + ")\n";
+    instructions += "STA :addr(" + var_.name + ")\n";
+  } else {
+    fprintf(stderr, "\033[1;31m==> %s + %s \033[0m\n", a1.name.c_str(), a2.name.c_str());
+    fprintf(stderr, "\033[1;31mYou can only add variable with the same type\033[0m\n");
+  }
+  return instructions;
+}
+
 affectation::affectation() {
   nb_ins = 2;
   type = AFFECTATION;
