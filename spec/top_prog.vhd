@@ -9,8 +9,8 @@ use IEEE.numeric_std.all;
 entity top_prog is 
   generic (
     data_size    : integer;    -- Taille de chaque mot stocké
-    address_size : integer;     -- Largeur de l'adresse
-    clk_div      : integer;        -- diviseur de l'horloge du fpga, défaut à 115200 Bauds avec clk à 100 MHz
+    address_size : integer;    -- Largeur de l'adresse
+    clk_div      : integer;    -- diviseur de l'horloge du fpga
     ram_address_size : integer
   );
   port (
